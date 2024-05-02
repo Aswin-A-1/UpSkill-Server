@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import asyncHandler from 'express-async-handler';
 import { Student } from '../../models/student_model';
 
+// student controllers
+
 
 export const AdminStudentController = {
 
