@@ -28,8 +28,8 @@ export const AdminStudentController = {
             } else {
                 student.isBlocked = !student.isBlocked
                 await student.save()
-                const students = await Student.find({ role: 'Student' })
-                res.status(200).json({ message: 'Updated succesfully', students });
+                const updatedStudent = await Student.findById(id)
+                res.status(200).json({ message: 'Updated succesfully', updatedStudent });
             }
         } catch (error) {
             console.error(error);
