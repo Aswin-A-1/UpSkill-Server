@@ -164,11 +164,8 @@ export const StudentController = {
     // login
     login: asyncHandler(async (req: Request, res: Response) => {
         try {
-            // const authHeader = req.headers['authorization'];
-            // const token = authHeader && authHeader.split(' ')[1];
-            // console.log('Token received:', token);
             const { email, password } = req.body;
-            const student = await Student.findOne({ email });
+            const student = await Student.findOne({ email, role: "Student" });
             if (student) {
                 // Checking password match
                 const hashedPasswordFromDB = student.password;
