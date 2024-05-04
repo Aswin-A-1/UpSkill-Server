@@ -166,7 +166,7 @@ export const InstructorController = {
                 if (isPasswordCorrect) {
                     if (!instructor.isBlocked) {
                         // generate jwt token
-                        const token = generateToken(instructor._id, process.env.JWT_SECRET as string);
+                        const token = generateToken(instructor._id, instructor.role, process.env.JWT_SECRET as string);
                         res.status(200).json({ message: 'Login succesfull', token, instructor });
                     } else {
                         res.status(400).json({ message: 'Account is blocked' });

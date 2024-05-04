@@ -16,7 +16,8 @@ router.get('/redirect', passport.authenticate('google'), (req: Request, res: Res
     const user = JSON.stringify(req.user);
     // generate jwt token
     const user_id = JSON.parse(user)._id
-    const token = generateToken(user_id, process.env.JWT_SECRET as string);
+    const user_type = JSON.parse(user).role
+    const token = generateToken(user_id, user_type, process.env.JWT_SECRET as string);
     res.cookie('authResponse', JSON.stringify({ message, user, token }));
     res.redirect('http://localhost:4200/login');
 })

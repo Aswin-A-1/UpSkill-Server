@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import asyncHandler from 'express-async-handler';
 import { Student } from '../../models/student_model';
+import { Instructor } from '../../models/instructor_model';
 
 // student controllers
 
@@ -12,6 +13,17 @@ export const AdminStudentController = {
         try {
             const students = await Student.find({ role: 'Student' });
             res.status(200).json({ message: 'Succesfully fetched data', students });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'Error fetching student data.' });
+        }
+    }),
+
+    // getStudentDetails
+    getInstructors: asyncHandler(async (req: Request, res: Response) => {
+        try {
+            const instructors = await Instructor.find();
+            res.status(200).json({ message: 'Succesfully fetched data', instructors });
         } catch (error) {
             console.error(error);
             res.status(500).json({ error: 'Error fetching student data.' });
