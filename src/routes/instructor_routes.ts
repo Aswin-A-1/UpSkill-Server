@@ -20,6 +20,9 @@ router.post('/signup', InstructorController.registerInstructor);
 router.post('/signup/verify-otp', InstructorController.verifyOtp);
 router.post('/login', InstructorController.instructorlogin);
 router.post('/coursedetails', upload.single('courseImage'), InstructorCourseController.addcoursedetails);
+router.post('/savesection', InstructorCourseController.addsection);
+router.get('/getcourse/:instructorid', InstructorCourseController.getCourse);
+router.get('/getsection/:courseid', InstructorCourseController.getSection);
 
 
 export const instructorRoute = router;
