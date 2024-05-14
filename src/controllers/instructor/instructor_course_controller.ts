@@ -3,6 +3,7 @@ import asyncHandler from 'express-async-handler';
 import { Instructor } from '../../models/instructor_model';
 import { Course } from '../../models/course_model';
 import { Section } from '../../models/section_model';
+import { uploadS3Video } from '../../utils/s3uploader';
 
 
 export const InstructorCourseController = {
@@ -32,22 +33,67 @@ export const InstructorCourseController = {
     // Add section
     addsection: asyncHandler(async (req: Request, res: Response) => {
         try {
-            const { title, description, lessons } = req.body.section;
+            const { title, description, lessons } = JSON.parse(req.body.section);
             const courseId = req.body.courseId
+            const videos = req.files as Express.Multer.File[];
+            // console.log('video files recived in controller: ', videos)
+            // console.log('length: ', req.files?.length)
+            console.log('lessons before: ', lessons)
+            for (const i in videos) {
+                const s3Response: any = await uploadS3Video(videos[i]);
+                if (s3Response.error) {
+                    console.log(s3Response.msg)
+                }
+                const url = s3Response.Location
+                console.log('url of the video from the s3bucket: ', url)
+                lessons[i].video = url
+            }
+            console.log('lessons after: ', lessons)
+
             const newSection = new Section({
                 sectionname: title,
                 description: description,
                 lessons: lessons,
                 courseid: courseId,
             });
+            console.log('db insertion data: ', newSection)
             await newSection.save();
-            const sectionId = newSection._id;
             res.status(200).json({ message: 'Section saved', newSection });
         } catch (error) {
             console.error(error);
             res.status(500).json({ error: 'Internal server error' });
         }
     }),
+    // addsection: asyncHandler(async (req: Request, res: Response) => {
+    //     try {
+    //         const { title, description, lessons } = JSON.parse(req.body.section);
+    //         console.log('lessonssss: ', lessons)
+    //         const courseId = req.body.courseId
+    //         const video = req.file;
+
+    //         const s3Response: any = await uploadS3Video(video)
+
+    //         if (s3Response.error) {
+    //             // throw new Error(s3Response.msg)
+    //             console.log(s3Response.msg)
+    //         }
+    //         const url = s3Response.Location
+    //         console.log('url of the image from the s3bucket: ', url)
+
+    //         const newSection = new Section({
+    //             sectionname: title,
+    //             description: description,
+    //             lessons: lessons,
+    //             courseid: courseId,
+    //         });
+    //         await newSection.save();
+    //         const sectionId = newSection._id;
+    //         res.status(200).json({ message: 'Section saved', newSection });
+    //     } catch (error) {
+    //         console.error(error);
+    //         res.status(500).json({ error: 'Internal server error' });
+    //     }
+    // }),
 
     // getCourseDetails
     getCourse: asyncHandler(async (req: Request, res: Response) => {

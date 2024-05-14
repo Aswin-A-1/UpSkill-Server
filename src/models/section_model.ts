@@ -9,7 +9,7 @@ interface Lesson {
 const lessonSchema = new Schema({
     title: { type: String, required: true },
     description: { type: String, required: true },
-    video: { type: String, required: false }
+    video: { type: String, required: true }
 });
 
 export interface SectionDocument extends Document {
