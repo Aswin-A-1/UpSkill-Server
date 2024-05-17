@@ -163,4 +163,32 @@ export const InstructorCourseController = {
             res.status(500).json({ error: 'Error editing lesson data.' });
         }
     }),
+
+    // editLessonWithVideo
+    editLessonWithVideo: asyncHandler(async (req: Request, res: Response) => {
+        try {
+            const { title, description, sectionId, lessonIndex } = req.body;
+            const videoFile = req.file as Express.Multer.File
+            const s3Response: any = await uploadS3Video(videoFile);
+            if(!s3Response.error) {
+                const url = s3Response.Location
+                console.log('url of the video from the s3bucket: ', url)
+                const section = await Section.findById(sectionId)
+                const lesson = section?.lessons[lessonIndex]
+                if(lesson) {
+                    section.lessons[lessonIndex].title = title
+                    section.lessons[lessonIndex].description = description
+                    section.lessons[lessonIndex].video = url
+                    await section.save()
+                    const newlesson = section.lessons[lessonIndex]
+                    res.status(200).json({ message: 'Lesson details and video edited succesfully.', newlesson });
+                } else {
+                    res.status(500).json({ error: 'Lesson not found.' });
+                }
+            }
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'Error editing lesson data.' });
+        }
+    }),
 }

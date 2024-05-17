@@ -16,6 +16,7 @@ const upload = multer({ storage: storage });
 
 const videostorage = multer.memoryStorage();
 const videoupload = multer();
+const singleVideoUpload = multer({ storage: videostorage })
 // const videoMemoryStorage = multer.memoryStorage();
 // const fileSizeLimit = 10 * 1024 * 1024;
 
@@ -39,6 +40,7 @@ router.get('/getcourse/:instructorid', InstructorCourseController.getCourse);
 router.get('/getsection/:courseid', InstructorCourseController.getSection);
 router.post('/editsection', InstructorCourseController.editSection);
 router.post('/editlesson', InstructorCourseController.editLesson);
+router.post('/editlessonwithvideo', singleVideoUpload.single('videofile'), InstructorCourseController.editLessonWithVideo);
 
 
 export const instructorRoute = router;
