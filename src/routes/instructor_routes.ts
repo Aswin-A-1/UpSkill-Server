@@ -37,6 +37,8 @@ router.post('/savesection', videoupload.any(), InstructorCourseController.addsec
 // router.post('/savesection', videoupload.single('videoFile'), InstructorCourseController.addsection);
 router.get('/getcourse/:instructorid', InstructorCourseController.getCourse);
 router.get('/getsection/:courseid', InstructorCourseController.getSection);
+router.post('/editsection', InstructorCourseController.editSection);
+router.post('/editlesson', InstructorCourseController.editLesson);
 
 
 export const instructorRoute = router;

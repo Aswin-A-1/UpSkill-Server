@@ -119,4 +119,48 @@ export const InstructorCourseController = {
         }
     }),
 
+    // editSection
+    editSection: asyncHandler(async (req: Request, res: Response) => {
+        try {
+            const title = req.body.title
+            const description = req.body.description
+            const sectionId = req.body.sectionId
+            const section = await Section.findById(sectionId)
+            if(section) {
+                section.sectionname = req.body.title
+                section.description = req.body.description
+                await section.save()
+                res.status(200).json({ message: 'Section edited succesfully.', section });
+            } else {
+                res.status(500).json({ error: 'Section not found.' });
+            }
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'Error editing section data.' });
+        }
+    }),
+
+    // editLesson
+    editLesson: asyncHandler(async (req: Request, res: Response) => {
+        try {
+            const title = req.body.title
+            const description = req.body.description
+            const sectionId = req.body.sectionId
+            const lessonIndex = req.body.lessonIndex
+            const section = await Section.findById(sectionId)
+            const lesson = section?.lessons[lessonIndex]
+            if(lesson) {
+                section.lessons[lessonIndex].title = title
+                section.lessons[lessonIndex].description = description
+                await section.save()
+                const newlesson = section.lessons[lessonIndex]
+                res.status(200).json({ message: 'Lesson details edited succesfully.', newlesson });
+            } else {
+                res.status(500).json({ error: 'Lesson not found.' });
+            }
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'Error editing lesson data.' });
+        }
+    }),
 }
