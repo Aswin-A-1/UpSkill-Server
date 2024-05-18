@@ -6,6 +6,7 @@ import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { Otp } from '../../models/session_model';
 import { generateToken } from '../../utils/jwtToken';
+import { ResponseStatus } from '../../types/ResponseStatus';
 
 declare module 'express-session' {
     interface SessionData {
@@ -61,7 +62,7 @@ export const StudentController = {
             const { username, email, password } = req.body;
             const emailExists = await Student.findOne({ email });
             if (emailExists) {
-                res.status(400).json({ error: 'Email already registered' });
+                res.status(ResponseStatus.BadRequest).json({ error: 'Email already registered' });
             } else {
                 // Generate OTP
                 const otp = generateOTP(4);
@@ -82,11 +83,11 @@ export const StudentController = {
                 } catch (error) {
                     console.error('Failed to save OTP:', error);
                 }
-                res.status(200).json({ message: 'OTP sented to mail.', email });
+                res.status(ResponseStatus.OK).json({ message: 'OTP sented to mail.', email });
             }
         } catch (error) {
             console.error(error);
-            res.status(500).json({ error: 'Internal server error' });
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Internal server error' });
         }
     }),
 
@@ -115,20 +116,20 @@ export const StudentController = {
                     }
                     await Student.create(newStudent)
                     .then(success=>{
-                        res.status(200).json({ message: 'Signup succesfull  :)' });
+                        res.status(ResponseStatus.OK).json({ message: 'Signup succesfull  :)' });
                     }).catch(error=>{
                         console.log('fail',error);
                     })
                     
                 } else {
-                    res.status(400).json({ error: 'Incorrect OTP  :(' });
+                    res.status(ResponseStatus.BadRequest).json({ error: 'Incorrect OTP  :(' });
                 }
             } else {
-                res.status(400).json({ error: 'OTP is exipired.' });
+                res.status(ResponseStatus.BadRequest).json({ error: 'OTP is exipired.' });
             }
         } catch (error) {
             console.error(error);
-            res.status(500).json({ error: 'Failed to register.' });
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Failed to register.' });
         }
     }),
 
@@ -154,10 +155,10 @@ export const StudentController = {
             } catch (error) {
                 console.error('Failed to save OTP:', error);
             }
-            res.status(200).json({ message: 'New OTP sent to mail.', email });
+            res.status(ResponseStatus.OK).json({ message: 'New OTP sent to mail.', email });
         } catch (error) {
             console.error(error);
-            res.status(500).json({ error: 'Internal server error' });
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Internal server error' });
         }
     }),
 
@@ -175,19 +176,19 @@ export const StudentController = {
                     if (!student.isBlocked) {
                         // generate jwt token
                         const token = generateToken(student._id, student.role, process.env.JWT_SECRET as string);
-                        res.status(200).json({ message: 'Login succesfull', token, student });
+                        res.status(ResponseStatus.OK).json({ message: 'Login succesfull', token, student });
                     } else {
-                        res.status(400).json({ message: 'Account is blocked' });
+                        res.status(ResponseStatus.BadRequest).json({ message: 'Account is blocked' });
                     }
                 } else {
-                    res.status(400).json({ message: 'Incorrect password' });
+                    res.status(ResponseStatus.BadRequest).json({ message: 'Incorrect password' });
                 }
             } else {
-                res.status(400).json({ message: 'Incorrect email and password' });
+                res.status(ResponseStatus.BadRequest).json({ message: 'Incorrect email and password' });
             }
         } catch (error) {
             console.error(error);
-            res.status(500).json({ error: 'Internal server error' });
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Internal server error' });
         }
     }),
 
@@ -199,7 +200,7 @@ export const StudentController = {
             console.log(user)
         } catch (error) {
             console.error(error);
-            res.status(500).json({ error: 'Internal server error' });
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Internal server error' });
         }
     }),
 };

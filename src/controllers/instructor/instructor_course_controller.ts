@@ -5,6 +5,7 @@ import { Course } from '../../models/course_model';
 import { Section } from '../../models/section_model';
 import { uploadS3Video } from '../../utils/s3uploader';
 import mongoose from 'mongoose';
+import { ResponseStatus } from '../../types/ResponseStatus';
 
 
 export const InstructorCourseController = {
@@ -24,10 +25,10 @@ export const InstructorCourseController = {
             });
             await newCourse.save();
             const courseId = newCourse._id;
-            res.status(200).json({ message: 'Course created, add sections', courseId });
+            res.status(ResponseStatus.OK).json({ message: 'Course created, add sections', courseId });
         } catch (error) {
             console.error(error);
-            res.status(500).json({ error: 'Internal server error' });
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Internal server error' });
         }
     }),
 
@@ -59,10 +60,10 @@ export const InstructorCourseController = {
             });
             console.log('db insertion data: ', newSection)
             await newSection.save();
-            res.status(200).json({ message: 'Section saved', newSection });
+            res.status(ResponseStatus.OK).json({ message: 'Section saved', newSection });
         } catch (error) {
             console.error(error);
-            res.status(500).json({ error: 'Internal server error' });
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Internal server error' });
         }
     }),
     // addsection: asyncHandler(async (req: Request, res: Response) => {
@@ -89,10 +90,10 @@ export const InstructorCourseController = {
     //         });
     //         await newSection.save();
     //         const sectionId = newSection._id;
-    //         res.status(200).json({ message: 'Section saved', newSection });
+    //         res.status(ResponseStatus.OK).json({ message: 'Section saved', newSection });
     //     } catch (error) {
     //         console.error(error);
-    //         res.status(500).json({ error: 'Internal server error' });
+    //         res.status(ResponseStatus.InternalServerError).json({ error: 'Internal server error' });
     //     }
     // }),
 
@@ -101,10 +102,10 @@ export const InstructorCourseController = {
         try {
             const instructorid = req.params.instructorid
             const courses = await Course.find({ instructorid: instructorid });
-            res.status(200).json({ message: 'Succesfully fetched data', courses });
+            res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', courses });
         } catch (error) {
             console.error(error);
-            res.status(500).json({ error: 'Error fetching course data.' });
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Error fetching course data.' });
         }
     }),
 
@@ -113,10 +114,10 @@ export const InstructorCourseController = {
         try {
             const courseid = req.params.courseid
             const sections = await Section.find({ courseid: courseid });
-            res.status(200).json({ message: 'Succesfully fetched data', sections });
+            res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', sections });
         } catch (error) {
             console.error(error);
-            res.status(500).json({ error: 'Error fetching section data.' });
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Error fetching section data.' });
         }
     }),
 
@@ -131,13 +132,13 @@ export const InstructorCourseController = {
                 section.sectionname = req.body.title
                 section.description = req.body.description
                 await section.save()
-                res.status(200).json({ message: 'Section edited succesfully.', section });
+                res.status(ResponseStatus.OK).json({ message: 'Section edited succesfully.', section });
             } else {
-                res.status(500).json({ error: 'Section not found.' });
+                res.status(ResponseStatus.InternalServerError).json({ error: 'Section not found.' });
             }
         } catch (error) {
             console.error(error);
-            res.status(500).json({ error: 'Error editing section data.' });
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Error editing section data.' });
         }
     }),
 
@@ -148,12 +149,12 @@ export const InstructorCourseController = {
             const result = await Section.findByIdAndDelete(sectionId);
             console.log(result)
             if(result) {
-                res.status(200).json({ message: 'Section deleted succesfully.' });
+                res.status(ResponseStatus.OK).json({ message: 'Section deleted succesfully.' });
             } else {
-                res.status(500).json({ error: 'No such section.' });
+                res.status(ResponseStatus.InternalServerError).json({ error: 'No such section.' });
             }
         } catch (error) {
-            res.status(500).json({ error: 'Error deleting section data.' });
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Error deleting section data.' });
         }
     }),
 
@@ -166,12 +167,12 @@ export const InstructorCourseController = {
             if (section) {
                 section.lessons.splice(lessonIndex, 1)
                 await section.save()
-                res.status(200).json({ message: 'Lesson deleted succesfully.' });
+                res.status(ResponseStatus.OK).json({ message: 'Lesson deleted succesfully.' });
             } else {
-                res.status(500).json({ error: 'Section not found.' });
+                res.status(ResponseStatus.InternalServerError).json({ error: 'Section not found.' });
             }
         } catch (error) {
-            res.status(500).json({ error: 'Error deleting lesson data.' });
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Error deleting lesson data.' });
         }
     }),
 
@@ -189,13 +190,13 @@ export const InstructorCourseController = {
                 section.lessons[lessonIndex].description = description
                 await section.save()
                 const newlesson = section.lessons[lessonIndex]
-                res.status(200).json({ message: 'Lesson details edited succesfully.', newlesson });
+                res.status(ResponseStatus.OK).json({ message: 'Lesson details edited succesfully.', newlesson });
             } else {
-                res.status(500).json({ error: 'Lesson not found.' });
+                res.status(ResponseStatus.InternalServerError).json({ error: 'Lesson not found.' });
             }
         } catch (error) {
             console.error(error);
-            res.status(500).json({ error: 'Error editing lesson data.' });
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Error editing lesson data.' });
         }
     }),
 
@@ -216,14 +217,14 @@ export const InstructorCourseController = {
                     section.lessons[lessonIndex].video = url
                     await section.save()
                     const newlesson = section.lessons[lessonIndex]
-                    res.status(200).json({ message: 'Lesson details and video edited succesfully.', newlesson });
+                    res.status(ResponseStatus.OK).json({ message: 'Lesson details and video edited succesfully.', newlesson });
                 } else {
-                    res.status(500).json({ error: 'Lesson not found.' });
+                    res.status(ResponseStatus.InternalServerError).json({ error: 'Lesson not found.' });
                 }
             }
         } catch (error) {
             console.error(error);
-            res.status(500).json({ error: 'Error editing lesson data.' });
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Error editing lesson data.' });
         }
     }),
 
@@ -250,14 +251,14 @@ export const InstructorCourseController = {
 
                     section.lessons.push(newLesson);
                     await section.save()
-                    res.status(200).json({ message: 'Lesson added succesfully.', newLesson });
+                    res.status(ResponseStatus.OK).json({ message: 'Lesson added succesfully.', newLesson });
                 } else {
-                    res.status(500).json({ error: 'Sectionn not found.' });
+                    res.status(ResponseStatus.InternalServerError).json({ error: 'Sectionn not found.' });
                 }
             }
         } catch (error) {
             console.error(error);
-            res.status(500).json({ error: 'Error adding lesson.' });
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Error adding lesson.' });
         }
     }),
 }

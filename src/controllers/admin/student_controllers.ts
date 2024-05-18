@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import asyncHandler from 'express-async-handler';
 import { Student } from '../../models/student_model';
 import { Instructor } from '../../models/instructor_model';
+import { ResponseStatus } from '../../types/ResponseStatus';
 
 // student controllers
 
@@ -12,10 +13,10 @@ export const AdminStudentController = {
     getStudents: asyncHandler(async (req: Request, res: Response) => {
         try {
             const students = await Student.find({ role: 'Student' });
-            res.status(200).json({ message: 'Succesfully fetched data', students });
+            res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', students });
         } catch (error) {
             console.error(error);
-            res.status(500).json({ error: 'Error fetching student data.' });
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Error fetching student data.' });
         }
     }),
 
@@ -23,10 +24,10 @@ export const AdminStudentController = {
     getInstructors: asyncHandler(async (req: Request, res: Response) => {
         try {
             const instructors = await Instructor.find();
-            res.status(200).json({ message: 'Succesfully fetched data', instructors });
+            res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', instructors });
         } catch (error) {
             console.error(error);
-            res.status(500).json({ error: 'Error fetching student data.' });
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Error fetching student data.' });
         }
     }),
 
@@ -36,16 +37,16 @@ export const AdminStudentController = {
             const id = req.params.id
             const student = await Student.findById(id)
             if (!student) {
-                res.status(500).json({ error: 'No student found.' });
+                res.status(ResponseStatus.InternalServerError).json({ error: 'No student found.' });
             } else {
                 student.isBlocked = !student.isBlocked
                 await student.save()
                 const updatedStudent = await Student.findById(id)
-                res.status(200).json({ message: 'Updated succesfully', updatedStudent });
+                res.status(ResponseStatus.OK).json({ message: 'Updated succesfully', updatedStudent });
             }
         } catch (error) {
             console.error(error);
-            res.status(500).json({ error: 'Error fetching student data.' });
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Error fetching student data.' });
         }
     }),
 };
