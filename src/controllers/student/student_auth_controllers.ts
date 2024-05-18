@@ -1,56 +1,17 @@
 import { Request, Response } from 'express';
 import asyncHandler from 'express-async-handler';
 import { Student } from '../../models/student_model';
-import nodemailer from 'nodemailer';
-import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { Otp } from '../../models/session_model';
 import { generateToken } from '../../utils/jwtToken';
 import { ResponseStatus } from '../../types/ResponseStatus';
+import { generateOTP, sendOtpEmail } from '../../utils/otp';
 
 declare module 'express-session' {
     interface SessionData {
         generatedOtp: string;
     }
 }
-
-// OTP generator function
-const generateOTP = (length: number): string => {
-    const digits = "0123456789";
-    let OTP = "";
-
-    for (let i = 0; i < length; i++) {
-        const randomIndex = crypto.randomInt(0, digits.length);
-        OTP += digits[randomIndex];
-    }
-
-    return OTP;
-};
-
-// Email sending function
-const sendOtpEmail = async (email: string, otp: string): Promise<void> => {
-    const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-            user: process.env.EMAIL_USER || '',
-            pass: process.env.EMAIL_PASS || '',
-        },
-    });
-
-    const mailOptions = {
-        from: process.env.EMAIL_USER || '',
-        to: email,
-        subject: "One-Time Password (OTP) for Authentication for UpSkill",
-        text: `Your Authentication OTP is: ${otp}`,
-    };
-
-    try {
-        const info = await transporter.sendMail(mailOptions);
-        console.log("Email sent:", info.response);
-    } catch (error) {
-        console.error("Error sending email:", error);
-    }
-};
 
 
 export const StudentController = {
@@ -167,7 +128,7 @@ export const StudentController = {
         try {
             const { email, password } = req.body;
             const student = await Student.findOne({ email, role: "Student" });
-            if (student) {
+            if (student && student.password) {
                 // Checking password match
                 const hashedPasswordFromDB = student.password;
                 const isPasswordCorrect = await bcrypt.compare(password, hashedPasswordFromDB);
