@@ -41,6 +41,9 @@ router.get('/getsection/:courseid', InstructorCourseController.getSection);
 router.post('/editsection', InstructorCourseController.editSection);
 router.post('/editlesson', InstructorCourseController.editLesson);
 router.post('/editlessonwithvideo', singleVideoUpload.single('videofile'), InstructorCourseController.editLessonWithVideo);
+router.post('/addlesson', singleVideoUpload.single('videofile'), InstructorCourseController.addNewLesson);
+router.post('/deletesection', InstructorCourseController.deleteSection);
+router.post('/deletelesson', InstructorCourseController.deleteLesson);
 
 
 export const instructorRoute = router;

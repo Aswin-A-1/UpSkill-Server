@@ -4,6 +4,7 @@ import { Instructor } from '../../models/instructor_model';
 import { Course } from '../../models/course_model';
 import { Section } from '../../models/section_model';
 import { uploadS3Video } from '../../utils/s3uploader';
+import mongoose from 'mongoose';
 
 
 export const InstructorCourseController = {
@@ -126,7 +127,7 @@ export const InstructorCourseController = {
             const description = req.body.description
             const sectionId = req.body.sectionId
             const section = await Section.findById(sectionId)
-            if(section) {
+            if (section) {
                 section.sectionname = req.body.title
                 section.description = req.body.description
                 await section.save()
@@ -140,6 +141,40 @@ export const InstructorCourseController = {
         }
     }),
 
+    // deleteSection
+    deleteSection: asyncHandler(async (req: Request, res: Response) => {
+        try {
+            const sectionId = req.body.sectionId
+            const result = await Section.findByIdAndDelete(sectionId);
+            console.log(result)
+            if(result) {
+                res.status(200).json({ message: 'Section deleted succesfully.' });
+            } else {
+                res.status(500).json({ error: 'No such section.' });
+            }
+        } catch (error) {
+            res.status(500).json({ error: 'Error deleting section data.' });
+        }
+    }),
+
+    // deleteLesson
+    deleteLesson: asyncHandler(async (req: Request, res: Response) => {
+        try {
+            const sectionId = req.body.sectionId
+            const lessonIndex = req.body.lessonIndex
+            const section = await Section.findById(sectionId)
+            if (section) {
+                section.lessons.splice(lessonIndex, 1)
+                await section.save()
+                res.status(200).json({ message: 'Lesson deleted succesfully.' });
+            } else {
+                res.status(500).json({ error: 'Section not found.' });
+            }
+        } catch (error) {
+            res.status(500).json({ error: 'Error deleting lesson data.' });
+        }
+    }),
+
     // editLesson
     editLesson: asyncHandler(async (req: Request, res: Response) => {
         try {
@@ -149,7 +184,7 @@ export const InstructorCourseController = {
             const lessonIndex = req.body.lessonIndex
             const section = await Section.findById(sectionId)
             const lesson = section?.lessons[lessonIndex]
-            if(lesson) {
+            if (lesson) {
                 section.lessons[lessonIndex].title = title
                 section.lessons[lessonIndex].description = description
                 await section.save()
@@ -170,12 +205,12 @@ export const InstructorCourseController = {
             const { title, description, sectionId, lessonIndex } = req.body;
             const videoFile = req.file as Express.Multer.File
             const s3Response: any = await uploadS3Video(videoFile);
-            if(!s3Response.error) {
+            if (!s3Response.error) {
                 const url = s3Response.Location
                 console.log('url of the video from the s3bucket: ', url)
                 const section = await Section.findById(sectionId)
                 const lesson = section?.lessons[lessonIndex]
-                if(lesson) {
+                if (lesson) {
                     section.lessons[lessonIndex].title = title
                     section.lessons[lessonIndex].description = description
                     section.lessons[lessonIndex].video = url
@@ -189,6 +224,40 @@ export const InstructorCourseController = {
         } catch (error) {
             console.error(error);
             res.status(500).json({ error: 'Error editing lesson data.' });
+        }
+    }),
+
+
+    // addNewLesson
+    addNewLesson: asyncHandler(async (req: Request, res: Response) => {
+        try {
+            const { title, description, sectionId } = req.body;
+            const videoFile = req.file as Express.Multer.File
+            console.log('new lesson body: ', req.body)
+            console.log('new lesson video file: ', videoFile)
+            const s3Response: any = await uploadS3Video(videoFile);
+            if (!s3Response.error) {
+                const url = s3Response.Location
+                console.log('url of the video from the s3bucket: ', url)
+                const section = await Section.findById(sectionId)
+                if (section) {
+                    const newLesson = {
+                        _id: new mongoose.Types.ObjectId(),
+                        title,
+                        description,
+                        video: url
+                    };
+
+                    section.lessons.push(newLesson);
+                    await section.save()
+                    res.status(200).json({ message: 'Lesson added succesfully.', newLesson });
+                } else {
+                    res.status(500).json({ error: 'Sectionn not found.' });
+                }
+            }
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'Error adding lesson.' });
         }
     }),
 }
