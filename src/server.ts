@@ -2,7 +2,8 @@ import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import session from 'express-session';
-import cookieParser from 'cookie-parser'
+import cookieParser from 'cookie-parser';
+import path from 'path';
 
 import crypto from 'crypto';
 import MongoStore from 'connect-mongo'
@@ -52,6 +53,8 @@ app.use('/api/admin', adminRoute)
 app.use('/api/instructor', instructorRoute)
 
 app.use('/auth/google', googleRoute)
+
+app.use('/public', express.static(path.join(__dirname, '../public')));
 
 
 

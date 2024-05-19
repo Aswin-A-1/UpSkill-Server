@@ -34,7 +34,6 @@ const authenticateStudentToken = (req: Request, res: Response, next: any) => {
         if (err) {
             return res.sendStatus(403);
         } else {
-            console.log('from token middleware, decoded data: ', decoded)
             req.user_id = decoded.id;
             next();
         }
