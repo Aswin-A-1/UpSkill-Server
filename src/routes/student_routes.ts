@@ -1,6 +1,6 @@
 import express, { Router, Request, Response } from 'express';
 import { StudentController } from '../controllers/student/student_auth_controllers';
-import authenticateToken from '../middlewares/auth_middlewares';
+import authenticateToken from '../middlewares/student_auth_middleware';
 import passport from 'passport'
 
 const router: Router = express.Router();

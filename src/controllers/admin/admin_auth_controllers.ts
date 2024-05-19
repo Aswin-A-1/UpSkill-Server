@@ -31,6 +31,7 @@ export const AdminAuthController = {
                     res.status(ResponseStatus.BadRequest).json({ message: 'Incorrect password' });
                 }
             } else {
+                console.log('amdin not found')
                 res.status(ResponseStatus.BadRequest).json({ message: 'Incorrect email and password' });
             }
         } catch (error) {

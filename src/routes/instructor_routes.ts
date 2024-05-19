@@ -2,6 +2,7 @@ import express, { Router, Request, Response } from 'express';
 import { InstructorController } from '../controllers/instructor/instructor_auth_controllers';
 import multer from 'multer';
 import { InstructorCourseController } from '../controllers/instructor/instructor_course_controller';
+import authenticateInstructorToken from '../middlewares/instructor_auth_middleware';
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -36,8 +37,8 @@ router.post('/login', InstructorController.instructorlogin);
 router.post('/coursedetails', upload.single('courseImage'), InstructorCourseController.addcoursedetails);
 router.post('/savesection', videoupload.any(), InstructorCourseController.addsection);
 // router.post('/savesection', videoupload.single('videoFile'), InstructorCourseController.addsection);
-router.get('/getcourse/:instructorid', InstructorCourseController.getCourse);
-router.get('/getsection/:courseid', InstructorCourseController.getSection);
+router.get('/getcourse/:instructorid', authenticateInstructorToken, InstructorCourseController.getCourse);
+router.get('/getsection/:courseid', authenticateInstructorToken, InstructorCourseController.getSection);
 router.post('/editsection', InstructorCourseController.editSection);
 router.post('/editlesson', InstructorCourseController.editLesson);
 router.post('/editlessonwithvideo', singleVideoUpload.single('videofile'), InstructorCourseController.editLessonWithVideo);
