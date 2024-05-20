@@ -6,7 +6,7 @@ import authenticateInstructorToken from '../middlewares/instructor_auth_middlewa
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, 'src/public');
+        cb(null, 'src/public/courseImage');
     },
     filename: function (req, file, cb) {
         cb(null, Date.now() + '-' + file.originalname);
@@ -18,6 +18,7 @@ const upload = multer({ storage: storage });
 const videostorage = multer.memoryStorage();
 const videoupload = multer();
 const singleVideoUpload = multer({ storage: videostorage })
+const singleImageUpload = multer({ storage: videostorage })
 // const videoMemoryStorage = multer.memoryStorage();
 // const fileSizeLimit = 10 * 1024 * 1024;
 
@@ -34,7 +35,7 @@ const router: Router = express.Router();
 router.post('/signup', InstructorController.registerInstructor);
 router.post('/signup/verify-otp', InstructorController.verifyOtp);
 router.post('/login', InstructorController.instructorlogin);
-router.post('/coursedetails', upload.single('courseImage'), InstructorCourseController.addcoursedetails);
+router.post('/coursedetails', singleImageUpload.single('courseImage'), InstructorCourseController.addcoursedetails);
 router.post('/savesection', videoupload.any(), InstructorCourseController.addsection);
 // router.post('/savesection', videoupload.single('videoFile'), InstructorCourseController.addsection);
 router.get('/getcourse/:instructorid', authenticateInstructorToken, InstructorCourseController.getCourse);

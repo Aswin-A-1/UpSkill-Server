@@ -11,7 +11,7 @@ export const StudentHomeController = {
     // getCourses
     getCourses: asyncHandler(async (req: Request, res: Response) => {
         try {
-            const courses = await Course.find();
+            const courses = await Course.find({ isActive: true });
             res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', courses });
         } catch (error) {
             console.error(error);

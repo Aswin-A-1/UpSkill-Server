@@ -3,7 +3,7 @@ import asyncHandler from 'express-async-handler';
 import { Instructor } from '../../models/instructor_model';
 import { Course } from '../../models/course_model';
 import { Section } from '../../models/section_model';
-import { uploadS3Video } from '../../utils/s3uploader';
+import { uploadS3Image, uploadS3Video } from '../../utils/s3uploader';
 import mongoose from 'mongoose';
 import { ResponseStatus } from '../../types/ResponseStatus';
 
@@ -14,7 +14,15 @@ export const InstructorCourseController = {
     addcoursedetails: asyncHandler(async (req: Request, res: Response) => {
         try {
             const { courseName, courseDescription, courseCategory, coursePrice, instructorId } = req.body;
-            const thumbnailImage = req.file?.filename;
+            const imageFile = req.file as Express.Multer.File
+            const s3Response: any = await uploadS3Image(imageFile);
+            let thumbnailImage = ''
+            if (!s3Response.error) {
+                thumbnailImage = s3Response.Location
+                console.log('url of the video from the s3bucket: ', thumbnailImage)
+            } else {
+                res.status(ResponseStatus.InternalServerError).json({ error: 'Failed to upload file' });
+            }
             const newCourse = new Course({
                 coursename: courseName,
                 description: courseDescription,
@@ -37,6 +45,7 @@ export const InstructorCourseController = {
         try {
             const { title, description, lessons } = JSON.parse(req.body.section);
             const courseId = req.body.courseId
+            const course = await Course.findById(courseId)
             const videos = req.files as Express.Multer.File[];
             for (const i in videos) {
                 const s3Response: any = await uploadS3Video(videos[i]);
@@ -55,6 +64,13 @@ export const InstructorCourseController = {
                 courseid: courseId,
             });
             await newSection.save();
+            if(course) {
+                course.sections.push(newSection._id)
+                if(course.sections.length > 0) {
+                    course.isActive = true
+                }
+                await course.save();
+            }
             res.status(ResponseStatus.OK).json({ message: 'Section saved', newSection });
         } catch (error) {
             console.error(error);
@@ -196,8 +212,6 @@ export const InstructorCourseController = {
         try {
             const { title, description, sectionId } = req.body;
             const videoFile = req.file as Express.Multer.File
-            console.log('new lesson body: ', req.body)
-            console.log('new lesson video file: ', videoFile)
             const s3Response: any = await uploadS3Video(videoFile);
             if (!s3Response.error) {
                 const url = s3Response.Location

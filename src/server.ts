@@ -54,7 +54,7 @@ app.use('/api/instructor', instructorRoute)
 
 app.use('/auth/google', googleRoute)
 
-app.use('/public', express.static(path.join(__dirname, '../public')));
+app.use(express.static(path.join(__dirname,'public')))
 
 
 
