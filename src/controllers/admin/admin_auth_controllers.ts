@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import asyncHandler from 'express-async-handler';
 import { Student } from '../../models/student_model';
-import { Instructor } from '../../models/instructor_model';
 import bcrypt from 'bcryptjs';
 import { generateToken } from '../../utils/jwtToken';
 import { ResponseStatus } from '../../types/ResponseStatus';

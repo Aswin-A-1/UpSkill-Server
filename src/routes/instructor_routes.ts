@@ -3,6 +3,7 @@ import { InstructorController } from '../controllers/instructor/instructor_auth_
 import multer from 'multer';
 import { InstructorCourseController } from '../controllers/instructor/instructor_course_controller';
 import authenticateInstructorToken from '../middlewares/instructor_auth_middleware';
+import { InstructorProfileController } from '../controllers/instructor/instructor_profile_controllers';
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -37,8 +38,8 @@ router.post('/signup/verify-otp', InstructorController.verifyOtp);
 router.post('/login', InstructorController.instructorlogin);
 router.post('/coursedetails', singleImageUpload.single('courseImage'), InstructorCourseController.addcoursedetails);
 router.post('/savesection', videoupload.any(), InstructorCourseController.addsection);
-// router.post('/savesection', videoupload.single('videoFile'), InstructorCourseController.addsection);
 router.get('/getcourse/:instructorid', authenticateInstructorToken, InstructorCourseController.getCourse);
+router.get('/getverification/:instructorid', authenticateInstructorToken, InstructorCourseController.getVerification);
 router.get('/getsection/:courseid', authenticateInstructorToken, InstructorCourseController.getSection);
 router.post('/editsection', InstructorCourseController.editSection);
 router.post('/editlesson', InstructorCourseController.editLesson);
@@ -46,6 +47,7 @@ router.post('/editlessonwithvideo', singleVideoUpload.single('videofile'), Instr
 router.post('/addlesson', singleVideoUpload.single('videofile'), InstructorCourseController.addNewLesson);
 router.post('/deletesection', InstructorCourseController.deleteSection);
 router.post('/deletelesson', InstructorCourseController.deleteLesson);
+router.post('/updateprofile', videoupload.any(), InstructorProfileController.updateProfile);
 
 
 export const instructorRoute = router;

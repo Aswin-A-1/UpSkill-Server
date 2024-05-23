@@ -90,6 +90,19 @@ export const InstructorCourseController = {
         }
     }),
 
+    // getVerification
+    getVerification: asyncHandler(async (req: Request, res: Response) => {
+        try {
+            const instructorid = req.params.instructorid
+            const instructor = await Instructor.findById(instructorid)
+            const verification = instructor?.isVerified
+            res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', verification });
+        } catch (error) {
+            console.error(error);
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Error fetching instructor data.' });
+        }
+    }),
+
     // getSection
     getSection: asyncHandler(async (req: Request, res: Response) => {
         try {
