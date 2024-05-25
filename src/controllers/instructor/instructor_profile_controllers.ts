@@ -58,6 +58,38 @@ export const InstructorProfileController = {
         }
     }),
 
+    // updateVerification
+    updateVerification: asyncHandler(async (req: Request, res: Response) => {
+        try {
+            const instructorid = req.body.instructorid
+            const instructor = await Instructor.findById(instructorid)
+            if(instructor) {
+                instructor.isVerified = !instructor?.isVerified
+                await instructor.save()
+            }
+            res.status(ResponseStatus.OK).json({ message: 'Succesfully updated verification status', instructor });
+        } catch (error) {
+            console.error(error);
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Error updating instructor data.' });
+        }
+    }),
+
+    // updateBlock
+    updateBlock: asyncHandler(async (req: Request, res: Response) => {
+        try {
+            const instructorid = req.body.instructorid
+            const instructor = await Instructor.findById(instructorid)
+            if(instructor) {
+                instructor.isBlocked = !instructor?.isBlocked
+                await instructor.save()
+            }
+            res.status(ResponseStatus.OK).json({ message: 'Succesfully updated block status', instructor });
+        } catch (error) {
+            console.error(error);
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Error updating instructor status.' });
+        }
+    }),
+
     // getInstructorProfile
     getInstructorProfile: asyncHandler(async (req: Request, res: Response) => {
         try {
