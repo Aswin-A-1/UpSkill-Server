@@ -35,7 +35,7 @@ export const InstructorProfileController = {
                         console.log(s3Response.msg)
                     }
                     const url = s3Response.Location
-                    console.log('url of the video from the s3bucket: ', url)
+                    console.log('url of the image from the s3bucket: ', url)
                     instructor.profilepic = url
                 }
                 if(certificates.length > 0) {
@@ -45,7 +45,7 @@ export const InstructorProfileController = {
                             console.log(s3Response.msg)
                         }
                         const url = s3Response.Location
-                        console.log('url of the video from the s3bucket: ', url)
+                        console.log('url of the image from the s3bucket: ', url)
                         instructor.certificates.push(url)
                     }
                 }
@@ -55,6 +55,18 @@ export const InstructorProfileController = {
         } catch (error) {
             console.error(error);
             res.status(ResponseStatus.InternalServerError).json({ error: 'Internal server error' });
+        }
+    }),
+
+    // getInstructorProfile
+    getInstructorProfile: asyncHandler(async (req: Request, res: Response) => {
+        try {
+            const instructorid = req.params.instructorid
+            const instructor = await Instructor.findById(instructorid)
+            res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', instructor });
+        } catch (error) {
+            console.error(error);
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Error fetching instructor data.' });
         }
     }),
 

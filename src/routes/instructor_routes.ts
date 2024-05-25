@@ -48,6 +48,7 @@ router.post('/addlesson', singleVideoUpload.single('videofile'), InstructorCours
 router.post('/deletesection', InstructorCourseController.deleteSection);
 router.post('/deletelesson', InstructorCourseController.deleteLesson);
 router.post('/updateprofile', videoupload.any(), InstructorProfileController.updateProfile);
+router.get('/getprofile/:instructorid', authenticateInstructorToken, InstructorProfileController.getInstructorProfile);
 
 
 export const instructorRoute = router;
