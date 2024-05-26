@@ -49,7 +49,6 @@ router.post('/deletesection', InstructorCourseController.deleteSection);
 router.post('/deletelesson', InstructorCourseController.deleteLesson);
 router.post('/updateprofile', videoupload.any(), InstructorProfileController.updateProfile);
 router.post('/updateverification', authenticateInstructorToken, InstructorProfileController.updateVerification);
-router.post('/updateBlock', authenticateInstructorToken, InstructorProfileController.updateBlock);
 router.get('/getprofile/:instructorid', authenticateInstructorToken, InstructorProfileController.getInstructorProfile);
 
 

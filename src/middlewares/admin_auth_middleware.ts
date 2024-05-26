@@ -26,7 +26,7 @@ const authenticateAdminToken = (req: Request, res: Response, next: any) => {
     if (token == null) {
         return res.sendStatus(401); // If there's no token, return 401 (Unauthorized)
     }
-    
+
     // Ensure the secret is defined and of the correct type
     const secret: Secret = process.env.JWT_SECRET as string;
 
