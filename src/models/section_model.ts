@@ -3,12 +3,14 @@ import mongoose, { Schema, Document } from 'mongoose'
 interface Lesson {
     title: string;
     description: string;
+    free: boolean;
     video: string;
 }
 
 const lessonSchema = new Schema({
     title: { type: String, required: true },
     description: { type: String, required: true },
+    free: { type: Boolean, required: true },
     video: { type: String, required: true }
 });
 

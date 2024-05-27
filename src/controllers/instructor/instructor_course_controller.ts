@@ -63,6 +63,7 @@ export const InstructorCourseController = {
                 lessons: lessons,
                 courseid: courseId,
             });
+
             await newSection.save();
             if(course) {
                 course.sections.push(newSection._id)
@@ -172,6 +173,7 @@ export const InstructorCourseController = {
         try {
             const title = req.body.title
             const description = req.body.description
+            const free = req.body.free
             const sectionId = req.body.sectionId
             const lessonIndex = req.body.lessonIndex
             const section = await Section.findById(sectionId)
@@ -179,6 +181,7 @@ export const InstructorCourseController = {
             if (lesson) {
                 section.lessons[lessonIndex].title = title
                 section.lessons[lessonIndex].description = description
+                section.lessons[lessonIndex].free = free
                 await section.save()
                 const newlesson = section.lessons[lessonIndex]
                 res.status(ResponseStatus.OK).json({ message: 'Lesson details edited succesfully.', newlesson });
@@ -194,7 +197,11 @@ export const InstructorCourseController = {
     // editLessonWithVideo
     editLessonWithVideo: asyncHandler(async (req: Request, res: Response) => {
         try {
-            const { title, description, sectionId, lessonIndex } = req.body;
+            const { title, description, isFree, sectionId, lessonIndex } = req.body;
+            let free = false
+            if(isFree == 'true') {
+                free = true
+            }
             const videoFile = req.file as Express.Multer.File
             const s3Response: any = await uploadS3Video(videoFile);
             if (!s3Response.error) {
@@ -205,6 +212,7 @@ export const InstructorCourseController = {
                 if (lesson) {
                     section.lessons[lessonIndex].title = title
                     section.lessons[lessonIndex].description = description
+                    section.lessons[lessonIndex].free = free
                     section.lessons[lessonIndex].video = url
                     await section.save()
                     const newlesson = section.lessons[lessonIndex]
@@ -223,7 +231,10 @@ export const InstructorCourseController = {
     // addNewLesson
     addNewLesson: asyncHandler(async (req: Request, res: Response) => {
         try {
-            const { title, description, sectionId } = req.body;
+            const { title, description, isFree, sectionId } = req.body;let free = false
+            if(isFree == 'true') {
+                free = true
+            }
             const videoFile = req.file as Express.Multer.File
             const s3Response: any = await uploadS3Video(videoFile);
             if (!s3Response.error) {
@@ -235,6 +246,7 @@ export const InstructorCourseController = {
                         _id: new mongoose.Types.ObjectId(),
                         title,
                         description,
+                        free,
                         video: url
                     };
 

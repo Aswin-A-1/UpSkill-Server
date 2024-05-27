@@ -12,7 +12,8 @@ router.post('/signup/verify-otp', StudentController.verifyOtp);
 router.post('/signup/resend-otp', StudentController.resendOtp);
 router.post('/login', StudentController.login);
 router.post('/test', authenticateToken, StudentController.test);
-router.get('/getcourses', authenticateStudentToken, StudentHomeController.getCourses);
+router.get('/getcourses', StudentHomeController.getCourses);
+router.post('/search', StudentHomeController.search);
 
 
 export const studentRoute = router;
