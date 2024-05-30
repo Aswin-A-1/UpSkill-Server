@@ -139,8 +139,16 @@ export const InstructorCourseController = {
     deleteSection: asyncHandler(async (req: Request, res: Response) => {
         try {
             const sectionId = req.body.sectionId
+            const courseId = req.body.courseId
+            const course = await Course.findById(courseId)
             const result = await Section.findByIdAndDelete(sectionId);
-            if(result) {
+            if (course && result) {
+                const index = course.sections.indexOf(sectionId)
+                course.sections.splice(index, 1)
+                if(course.sections.length == 0) {
+                    course.isActive = false
+                }
+                await course.save()
                 res.status(ResponseStatus.OK).json({ message: 'Section deleted succesfully.' });
             } else {
                 res.status(ResponseStatus.InternalServerError).json({ error: 'No such section.' });

@@ -3,6 +3,7 @@ import asyncHandler from 'express-async-handler';
 import { Student } from '../../models/student_model';
 import { Instructor } from '../../models/instructor_model';
 import { ResponseStatus } from '../../types/ResponseStatus';
+import { Course } from '../../models/course_model';
 
 // student controllers
 
@@ -20,14 +21,25 @@ export const AdminStudentController = {
         }
     }),
 
-    // getStudentDetails
+    // getInstructorDetails
     getInstructors: asyncHandler(async (req: Request, res: Response) => {
         try {
             const instructors = await Instructor.find();
             res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', instructors });
         } catch (error) {
             console.error(error);
-            res.status(ResponseStatus.InternalServerError).json({ error: 'Error fetching student data.' });
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Error fetching instructor data.' });
+        }
+    }),
+
+    // getCoureseDetails
+    getCourses: asyncHandler(async (req: Request, res: Response) => {
+        try {
+            const courses = await Course.find();
+            res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', courses });
+        } catch (error) {
+            console.error(error);
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Error fetching course data.' });
         }
     }),
 

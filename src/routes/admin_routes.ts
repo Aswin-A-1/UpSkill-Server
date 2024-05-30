@@ -8,6 +8,7 @@ const router: Router = express.Router();
 
 router.get('/getStudent', authenticateAdminToken, AdminStudentController.getStudents);
 router.get('/getInstructors', authenticateAdminToken, AdminStudentController.getInstructors);
+router.get('/getCourses', authenticateAdminToken, AdminStudentController.getCourses);
 router.post('/login', AdminAuthController.adminlogin)
 router.put('/manageStudent/:id', AdminStudentController.manageStudent)
 router.post('/updateBlock', authenticateAdminToken, InstructorProfileController.updateBlock);

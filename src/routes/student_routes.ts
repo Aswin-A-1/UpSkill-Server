@@ -13,6 +13,7 @@ router.post('/signup/resend-otp', StudentController.resendOtp);
 router.post('/login', StudentController.login);
 router.post('/test', authenticateToken, StudentController.test);
 router.get('/getcourses', StudentHomeController.getCourses);
+router.post('/getcourse', StudentHomeController.getCourse);
 router.post('/search', StudentHomeController.search);
 
 

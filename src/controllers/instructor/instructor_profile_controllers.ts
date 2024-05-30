@@ -9,6 +9,7 @@ export const InstructorProfileController = {
     // updateProfile
     updateProfile: asyncHandler(async (req: Request, res: Response) => {
         try {
+            console.log('working')
             const { qualification, instructorId } = req.body;
             const files = req.files as Express.Multer.File[];
             let profilePic: Express.Multer.File | undefined;

@@ -3,6 +3,7 @@ import asyncHandler from 'express-async-handler';
 import { Student } from '../../models/student_model';
 import { ResponseStatus } from '../../types/ResponseStatus';
 import { Course } from '../../models/course_model';
+import { Section } from '../../models/section_model';
 
 
 export const StudentHomeController = {
@@ -18,11 +19,24 @@ export const StudentHomeController = {
         }
     }),
 
+    // getCourse
+    getCourse: asyncHandler(async (req: Request, res: Response) => {
+        try {
+            const courseId = req.body.courseId
+            const course = await Course.findById(courseId);
+            const sections = await Section.find({ courseid: courseId });
+            res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', course, sections });
+        } catch (error) {
+            console.error(error);
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Internal server error' });
+        }
+    }),
+
     // search
     search: asyncHandler(async (req: Request, res: Response) => {
         try {
             const query = req.body.query
-            const courses = await Course.find({ coursename: { $regex: query, $options: 'i' } });
+            const courses = await Course.find({ coursename: { $regex: query, $options: 'i' }, isActive: true });
             res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', courses });
         } catch (error) {
             console.error(error);
