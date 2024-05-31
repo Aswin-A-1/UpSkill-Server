@@ -6,6 +6,7 @@ import { Section } from '../../models/section_model';
 import { uploadS3Image, uploadS3Video } from '../../utils/s3uploader';
 import mongoose from 'mongoose';
 import { ResponseStatus } from '../../types/ResponseStatus';
+import { Category } from '../../models/category_model';
 
 
 export const InstructorCourseController = {
@@ -90,6 +91,33 @@ export const InstructorCourseController = {
             res.status(ResponseStatus.InternalServerError).json({ error: 'Error fetching course data.' });
         }
     }),
+
+    // addCategory
+    addCategory: asyncHandler(async (req: Request, res: Response) => {
+        try {
+            const { name } = req.body;
+            const newCategory = new Category({
+                name: name
+            });
+            await newCategory.save();
+            res.status(ResponseStatus.OK).json({ message: 'Succesfully added category', newCategory });
+        } catch (error) {
+            console.error(error);
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Error adding category.' });
+        }
+    }),
+
+    // getCategoryDetails
+    getCategory: asyncHandler(async (req: Request, res: Response) => {
+        try {
+            const categorys = await Category.find();
+            res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', categorys });
+        } catch (error) {
+            console.error(error);
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Error fetching category data.' });
+        }
+    }),
+
 
     // getVerification
     getVerification: asyncHandler(async (req: Request, res: Response) => {
