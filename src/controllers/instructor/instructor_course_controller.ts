@@ -107,13 +107,27 @@ export const InstructorCourseController = {
         }
     }),
 
+    // deleteCategory
+    deleteCategory: asyncHandler(async (req: Request, res: Response) => {
+        try {
+            const { categoryId } = req.body;
+            const result = await Category.findByIdAndDelete(categoryId);
+            if (result) {
+                res.status(ResponseStatus.OK).json({ message: 'Succesfully deleted category' });
+            } else {
+                res.status(ResponseStatus.InternalServerError).json({ error: 'No such category.' });
+            }
+        } catch (error) {
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Error deleted category.' });
+        }
+    }),
+
     // getCategoryDetails
     getCategory: asyncHandler(async (req: Request, res: Response) => {
         try {
             const categorys = await Category.find();
             res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', categorys });
         } catch (error) {
-            console.error(error);
             res.status(ResponseStatus.InternalServerError).json({ error: 'Error fetching category data.' });
         }
     }),
