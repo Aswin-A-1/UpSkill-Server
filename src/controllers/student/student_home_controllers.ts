@@ -4,6 +4,7 @@ import { Student } from '../../models/student_model';
 import { ResponseStatus } from '../../types/ResponseStatus';
 import { Course } from '../../models/course_model';
 import { Section } from '../../models/section_model';
+import { Instructor } from '../../models/instructor_model';
 
 
 export const StudentHomeController = {
@@ -24,8 +25,9 @@ export const StudentHomeController = {
         try {
             const courseId = req.body.courseId
             const course = await Course.findById(courseId);
+            const instructor = await Instructor.findById(course?.instructorid)
             const sections = await Section.find({ courseid: courseId });
-            res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', course, sections });
+            res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', course, sections, instructor: instructor?.username });
         } catch (error) {
             console.error(error);
             res.status(ResponseStatus.InternalServerError).json({ error: 'Internal server error' });
