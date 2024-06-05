@@ -4,6 +4,7 @@ import authenticateToken from '../middlewares/student_auth_middleware';
 import passport from 'passport'
 import authenticateStudentToken from '../middlewares/student_auth_middleware';
 import { StudentHomeController } from '../controllers/student/student_home_controllers';
+import { StudentPaymentController } from '../controllers/student/student_payment_controllers';
 
 const router: Router = express.Router();
 
@@ -14,7 +15,9 @@ router.post('/login', StudentController.login);
 router.post('/test', authenticateToken, StudentController.test);
 router.get('/getcourses', StudentHomeController.getCourses);
 router.post('/getcourse', StudentHomeController.getCourse);
+router.post('/courseenroll', StudentHomeController.courseEnroll);
 router.post('/search', StudentHomeController.search);
+router.post('/create-payment-intent', StudentPaymentController.initPayment);
 
 
 export const studentRoute = router;

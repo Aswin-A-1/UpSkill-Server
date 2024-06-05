@@ -5,6 +5,7 @@ import { ResponseStatus } from '../../types/ResponseStatus';
 import { Course } from '../../models/course_model';
 import { Section } from '../../models/section_model';
 import { Instructor } from '../../models/instructor_model';
+import { Enrollment } from '../../models/enrollment_model';
 
 
 export const StudentHomeController = {
@@ -28,6 +29,23 @@ export const StudentHomeController = {
             const instructor = await Instructor.findById(course?.instructorid)
             const sections = await Section.find({ courseid: courseId });
             res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', course, sections, instructor: instructor?.username });
+        } catch (error) {
+            console.error(error);
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Internal server error' });
+        }
+    }),
+
+    // courseEnroll
+    courseEnroll: asyncHandler(async (req: Request, res: Response) => {
+        try {
+            const newEnrollment = new Enrollment({
+                paymentid: req.body.paymentId,
+                amount: req.body.amount,
+                studentid: req.body.userId,
+                courseid: req.body.courseId,
+            });
+            await newEnrollment.save();
+            res.status(ResponseStatus.OK).json({ message: 'Succesfully enrolled' });
         } catch (error) {
             console.error(error);
             res.status(ResponseStatus.InternalServerError).json({ error: 'Internal server error' });
