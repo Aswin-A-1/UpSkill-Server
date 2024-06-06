@@ -35,6 +35,36 @@ export const StudentHomeController = {
         }
     }),
 
+    // getMyCourse
+    getMyCourse: asyncHandler(async (req: Request, res: Response) => {
+        try {
+            const userId = req.body.userId
+            const enrollments = await Enrollment.find({ studentid: userId });
+            const courseIds = enrollments.map(enrollment => enrollment.courseid);
+            const courses = await Course.find({ _id: { $in: courseIds } });
+            res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', courses });
+        } catch (error) {
+            console.error(error);
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Internal server error' });
+        }
+    }),
+
+    // isEnrolled
+    isEnrolled: asyncHandler(async (req: Request, res: Response) => {
+        try {
+            const { courseId, studentId } = req.body
+            const course = await Enrollment.findOne({ courseid: courseId, studentid: studentId });
+            if (course) {
+                res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', isEnrolled: true });
+            } else {
+                res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', isEnrolled: false });
+            }
+        } catch (error) {
+            console.error(error);
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Internal server error' });
+        }
+    }),
+
     // courseEnroll
     courseEnroll: asyncHandler(async (req: Request, res: Response) => {
         try {
@@ -44,6 +74,8 @@ export const StudentHomeController = {
                 studentid: req.body.userId,
                 courseid: req.body.courseId,
             });
+            const student = await Student.findById(req.body.userId)
+
             await newEnrollment.save();
             res.status(ResponseStatus.OK).json({ message: 'Succesfully enrolled' });
         } catch (error) {

@@ -14,7 +14,7 @@ router.get('/getCategory', authenticateAdminToken, InstructorCourseController.ge
 router.post('/addcategory', authenticateAdminToken, InstructorCourseController.addCategory);
 router.post('/deletecategory', authenticateAdminToken, InstructorCourseController.deleteCategory);
 router.post('/login', AdminAuthController.adminlogin)
-router.put('/manageStudent/:id', AdminStudentController.manageStudent)
+router.put('/manageStudent/:id', authenticateAdminToken, AdminStudentController.manageStudent)
 router.post('/updateBlock', authenticateAdminToken, InstructorProfileController.updateBlock);
 
 

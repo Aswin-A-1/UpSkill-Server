@@ -15,6 +15,8 @@ router.post('/login', StudentController.login);
 router.post('/test', authenticateToken, StudentController.test);
 router.get('/getcourses', StudentHomeController.getCourses);
 router.post('/getcourse', StudentHomeController.getCourse);
+router.post('/getmycourse', StudentHomeController.getMyCourse);
+router.post('/isenrolled', StudentHomeController.isEnrolled);
 router.post('/courseenroll', StudentHomeController.courseEnroll);
 router.post('/search', StudentHomeController.search);
 router.post('/create-payment-intent', StudentPaymentController.initPayment);

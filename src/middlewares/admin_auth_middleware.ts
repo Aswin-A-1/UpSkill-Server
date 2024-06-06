@@ -1,5 +1,6 @@
 import { Request,Response } from 'express';
 import jwt, { VerifyErrors, Secret } from 'jsonwebtoken';
+import { Student } from '../models/student_model';
 
 interface User {
     _id: string;
@@ -30,12 +31,17 @@ const authenticateAdminToken = (req: Request, res: Response, next: any) => {
     // Ensure the secret is defined and of the correct type
     const secret: Secret = process.env.JWT_SECRET as string;
 
-    jwt.verify(token, secret, (err: VerifyErrors | null, decoded: User | any) => {
+    jwt.verify(token, secret, async (err: VerifyErrors | null, decoded: User | any) => {
         if (err) {
             return res.sendStatus(403);
         } else {
-            req.user_id = decoded.id;
-            next();
+            const admin = await Student.find({ _id: decoded.id, role: 'Admin' });
+            if(admin) {
+                req.user_id = decoded.id;
+                next();
+            } else {
+                return res.sendStatus(401);
+            }
         }
     });
 };
