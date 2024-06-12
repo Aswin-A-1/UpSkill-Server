@@ -39,6 +39,7 @@ router.post('/login', InstructorController.instructorlogin);
 router.post('/coursedetails', singleImageUpload.single('courseImage'), InstructorCourseController.addcoursedetails);
 router.post('/savesection', videoupload.any(), InstructorCourseController.addsection);
 router.get('/getcourse/:instructorid', authenticateInstructorToken, InstructorCourseController.getCourse);
+router.get('/getcategory', authenticateInstructorToken, InstructorCourseController.getCategory);
 router.get('/getverification/:instructorid', authenticateInstructorToken, InstructorCourseController.getVerification);
 router.get('/getsection/:courseid', authenticateInstructorToken, InstructorCourseController.getSection);
 router.post('/editsection', InstructorCourseController.editSection);

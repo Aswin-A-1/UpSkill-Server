@@ -19,13 +19,13 @@ const authenticateAdminToken = (req: Request, res: Response, next: any) => {
     const authHeader = req.headers['authorization-admin'];
 
     if (typeof authHeader !== 'string') {
-        return res.sendStatus(401); // If there's no token, return 401 (Unauthorized)
+        return res.sendStatus(400); // If there's no token, return 401 (Unauthorized)
     }
 
     const token = authHeader && authHeader.split(' ')[1];
 
     if (token == null) {
-        return res.sendStatus(401); // If there's no token, return 401 (Unauthorized)
+        return res.sendStatus(400); // If there's no token, return 401 (Unauthorized)
     }
 
     // Ensure the secret is defined and of the correct type
@@ -33,14 +33,14 @@ const authenticateAdminToken = (req: Request, res: Response, next: any) => {
 
     jwt.verify(token, secret, async (err: VerifyErrors | null, decoded: User | any) => {
         if (err) {
-            return res.sendStatus(403);
+            return res.sendStatus(400);
         } else {
             const admin = await Student.find({ _id: decoded.id, role: 'Admin' });
             if(admin) {
                 req.user_id = decoded.id;
                 next();
             } else {
-                return res.sendStatus(401);
+                return res.sendStatus(400);
             }
         }
     });

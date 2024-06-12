@@ -136,7 +136,7 @@ export const InstructorController = {
                     res.status(ResponseStatus.BadRequest).json({ message: 'Incorrect password' });
                 }
             } else {
-                res.status(ResponseStatus.BadRequest).json({ message: 'Incorrect email and password' });
+                res.status(ResponseStatus.NotFound).json({ message: 'Incorrect email and password' });
             }
         } catch (error) {
             console.error(error);

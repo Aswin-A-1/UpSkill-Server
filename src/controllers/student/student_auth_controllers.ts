@@ -3,9 +3,11 @@ import asyncHandler from 'express-async-handler';
 import { Student } from '../../models/student_model';
 import bcrypt from 'bcryptjs';
 import { Otp } from '../../models/session_model';
-import { generateToken } from '../../utils/jwtToken';
+import { generateRefreshToken, generateToken } from '../../utils/jwtToken';
 import { ResponseStatus } from '../../types/ResponseStatus';
 import { generateOTP, sendOtpEmail } from '../../utils/otp';
+import jwt from 'jsonwebtoken';
+import { generatenewtoken, verifyRefreshToken } from '../../utils/verifyRefreshToken';
 
 declare module 'express-session' {
     interface SessionData {
@@ -58,7 +60,7 @@ export const StudentController = {
             const { userData, enteredOtp } = req.body
             const { username, email, password } = JSON.parse(userData);
             const otpRecord = await Otp.findOne({ email });
-            
+
             if (otpRecord) {
                 if (otpRecord.otp == enteredOtp) {
                     const hashedPassword = await bcrypt.hash(password, 10);
@@ -70,18 +72,18 @@ export const StudentController = {
                     //     isBlocked: false,
                     //     googleId:"Nill"
                     // });
-                    const newStudent={
+                    const newStudent = {
                         username,
                         email,
-                        password:hashedPassword
+                        password: hashedPassword
                     }
                     await Student.create(newStudent)
-                    .then(success=>{
-                        res.status(ResponseStatus.OK).json({ message: 'Signup succesfull  :)' });
-                    }).catch(error=>{
-                        console.log('fail',error);
-                    })
-                    
+                        .then(success => {
+                            res.status(ResponseStatus.OK).json({ message: 'Signup succesfull  :)' });
+                        }).catch(error => {
+                            console.log('fail', error);
+                        })
+
                 } else {
                     res.status(ResponseStatus.BadRequest).json({ error: 'Incorrect OTP  :(' });
                 }
@@ -137,7 +139,8 @@ export const StudentController = {
                     if (!student.isBlocked) {
                         // generate jwt token
                         const token = generateToken(student._id, student.role, process.env.JWT_SECRET as string);
-                        res.status(ResponseStatus.OK).json({ message: 'Login succesfull', token, student });
+                        const refreshToken = generateRefreshToken(student._id, student.role, process.env.JWT_SECRET as string);
+                        res.status(ResponseStatus.OK).json({ message: 'Login succesfull', token, refreshToken, student });
                     } else {
                         res.status(ResponseStatus.BadRequest).json({ message: 'Account is blocked' });
                     }
@@ -149,7 +152,46 @@ export const StudentController = {
             }
         } catch (error) {
             console.error(error);
+            throw error
+            // res.status(ResponseStatus.InternalServerError).json({ error: 'Internal server error' });
+        }
+    }),
+
+    // refreshToken
+    refreshToken: asyncHandler(async (req: Request, res: Response) => {
+        try {
+            const { refreshToken } = req.body;
+            if (refreshToken) {
+                try {
+                    const isRefreshTokenVerified= await verifyRefreshToken(refreshToken);
+                    if (isRefreshTokenVerified) {
+                        const newAccessToken = await generatenewtoken(refreshToken);
+                        if(newAccessToken) {
+                            res.status(ResponseStatus.OK).json({ message: 'Token refreshed', accessToken: newAccessToken });
+                        }
+                    }
+                   
+                } catch (error) {
+                    throw error;
+                }
+            } else {
+                res.status(ResponseStatus.BadRequest).json({ error: "Refresh token is missing" });
+            }
+        } catch (error) {
+            console.error(error);
             res.status(ResponseStatus.InternalServerError).json({ error: 'Internal server error' });
+        }
+    }),
+
+    // getStudentProfile
+    getStudentProfile: asyncHandler(async (req: Request, res: Response) => {
+        try {
+            const studentid = req.params.studentid
+            const student = await Student.findById(studentid)
+            res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', student });
+        } catch (error) {
+            console.error(error);
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Error fetching student data.' });
         }
     }),
 

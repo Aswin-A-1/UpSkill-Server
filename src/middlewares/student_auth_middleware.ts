@@ -14,6 +14,32 @@ declare global {
     }
 }
 
+// const authenticateStudentToken = (req: Request, res: Response, next: any) => {
+//     const authHeader = req.headers['authorization-student'];
+
+//     if (typeof authHeader !== 'string') {
+//         return res.sendStatus(401); // If there's no token, return 401 (Unauthorized)
+//     }
+
+//     const token = authHeader && authHeader.split(' ')[1];
+
+//     if (token == null) {
+//         return res.sendStatus(401); // If there's no token, return 401 (Unauthorized)
+//     }
+    
+//     // Ensure the secret is defined and of the correct type
+//     const secret: Secret = process.env.JWT_SECRET as string;
+
+//     jwt.verify(token, secret, (err: VerifyErrors | null, decoded: User | any) => {
+//         if (err) {
+//             return res.sendStatus(403);
+//         } else {
+//             req.user_id = decoded.id;
+//             next();
+//         }
+//     });
+// };
+
 const authenticateStudentToken = (req: Request, res: Response, next: any) => {
     const authHeader = req.headers['authorization-student'];
 
@@ -32,7 +58,7 @@ const authenticateStudentToken = (req: Request, res: Response, next: any) => {
 
     jwt.verify(token, secret, (err: VerifyErrors | null, decoded: User | any) => {
         if (err) {
-            return res.sendStatus(403);
+            return res.sendStatus(401);
         } else {
             req.user_id = decoded.id;
             next();

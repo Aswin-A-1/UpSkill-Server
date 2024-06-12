@@ -18,13 +18,13 @@ const authenticateInstructorToken = (req: Request, res: Response, next: any) => 
     const authHeader = req.headers['authorization-instructor'];
 
     if (typeof authHeader !== 'string') {
-        return res.sendStatus(401); // If there's no token, return 401 (Unauthorized)
+        return res.sendStatus(400); // If there's no token, return 401 (Unauthorized)
     }
 
     const token = authHeader && authHeader.split(' ')[1];
 
     if (token == null) {
-        return res.sendStatus(401); // If there's no token, return 401 (Unauthorized)
+        return res.sendStatus(400); // If there's no token, return 401 (Unauthorized)
     }
     // Ensure the secret is defined and of the correct type
     const secret: Secret = process.env.JWT_SECRET as string;
