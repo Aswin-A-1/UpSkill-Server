@@ -16,6 +16,7 @@ import { googleRoute } from './routes/google_auth_routes';
 import { corsOption } from './config/cors_config';
 
 import './auth/passport'
+import { configureSocket } from './socket/socketConnection';
 
 dotenv.config();
 connectDatabase();
@@ -54,12 +55,14 @@ app.use('/api/instructor', instructorRoute)
 
 app.use('/auth/google', googleRoute)
 
-app.use(express.static(path.join(__dirname,'public')))
+app.use(express.static(path.join(__dirname, 'public')))
 
 
 
 app.get('*', (req: Request, res: Response) => res.sendStatus(404));
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
     console.log('app running on port ', PORT)
 })
+
+configureSocket(server)

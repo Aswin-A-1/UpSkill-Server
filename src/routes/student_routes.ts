@@ -5,6 +5,7 @@ import passport from 'passport'
 import authenticateStudentToken from '../middlewares/student_auth_middleware';
 import { StudentHomeController } from '../controllers/student/student_home_controllers';
 import { StudentPaymentController } from '../controllers/student/student_payment_controllers';
+import { ResponseStatus } from '../types/ResponseStatus';
 
 const router: Router = express.Router();
 
@@ -21,8 +22,12 @@ router.post('/getmycourse', StudentHomeController.getMyCourse);
 router.post('/isenrolled', StudentHomeController.isEnrolled);
 router.post('/courseenroll', StudentHomeController.courseEnroll);
 router.post('/search', StudentHomeController.search);
+router.post('/getmessages', StudentHomeController.getMessages);
 router.post('/create-payment-intent', StudentPaymentController.initPayment);
 router.get('/getprofile/:studentid', authenticateStudentToken, StudentController.getStudentProfile);
 
+router.get('/sample', (req: Request, res: Response) => {
+    res.status(ResponseStatus.OK).json({ message: 'Hello' });
+})
 
 export const studentRoute = router;

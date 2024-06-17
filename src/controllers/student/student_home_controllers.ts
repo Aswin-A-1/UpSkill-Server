@@ -6,6 +6,7 @@ import { Course } from '../../models/course_model';
 import { Section } from '../../models/section_model';
 import { Instructor } from '../../models/instructor_model';
 import { Enrollment } from '../../models/enrollment_model';
+import { Message } from '../../models/message_model';
 
 
 export const StudentHomeController = {
@@ -90,6 +91,23 @@ export const StudentHomeController = {
             const query = req.body.query
             const courses = await Course.find({ coursename: { $regex: query, $options: 'i' }, isActive: true });
             res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', courses });
+        } catch (error) {
+            console.error(error);
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Internal server error' });
+        }
+    }),
+
+    // getMessages
+    getMessages: asyncHandler(async (req: Request, res: Response) => {
+        try {
+            const { studentId, instructorId } = req.body
+            const messages = await Message.find({
+                $or: [
+                    { senderId: studentId, receiverId: instructorId },
+                    { senderId: instructorId, receiverId: studentId }
+                ]
+            }).sort({ timestamp: 1 });
+            res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched messages', messages });
         } catch (error) {
             console.error(error);
             res.status(ResponseStatus.InternalServerError).json({ error: 'Internal server error' });
