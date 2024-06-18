@@ -24,19 +24,21 @@ export function configureSocket(expressServer: httpServer) {
   const broadcasters: Record<string, string> = {}; // Store broadcaster socket IDs by room
 
   io.on("connection", (socket) => {
-    console.log("New client connected", socket.id);
 
     // Join a room
     socket.on('joinRoom', (roomId: string) => {
       socket.join(roomId);
-      console.log(`User joined room: ${roomId}`);
+    });
+
+    // Leave a room
+    socket.on('leaveRoom', (roomId: string) => {
+      socket.leave(roomId);
     });
 
     // Handle sendMessage
     socket.on('sendMessage', async (data: { senderId: string, receiverId: string, message: string }) => {
       const { senderId, receiverId, message } = data;
       const newMessage = new Message({ senderId, receiverId, message });
-      console.log('message recived: ', newMessage)
       await newMessage.save();
 
       // Emit message to the room
@@ -46,7 +48,6 @@ export function configureSocket(expressServer: httpServer) {
     });
 
     socket.on("disconnect", () => {
-      console.log("Client disconnected", socket.id);
       for (const room in rooms) {
         rooms[room] = rooms[room].filter((user) => user.userId !== socket.id);
         if (rooms[room].length === 0) {

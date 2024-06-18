@@ -7,6 +7,8 @@ import { uploadS3Image, uploadS3Video } from '../../utils/s3uploader';
 import mongoose from 'mongoose';
 import { ResponseStatus } from '../../types/ResponseStatus';
 import { Category } from '../../models/category_model';
+import { Enrollment } from '../../models/enrollment_model';
+import { Student } from '../../models/student_model';
 
 
 export const InstructorCourseController = {
@@ -66,9 +68,9 @@ export const InstructorCourseController = {
             });
 
             await newSection.save();
-            if(course) {
+            if (course) {
                 course.sections.push(newSection._id)
-                if(course.sections.length > 0) {
+                if (course.sections.length > 0) {
                     course.isActive = true
                 }
                 await course.save();
@@ -187,7 +189,7 @@ export const InstructorCourseController = {
             if (course && result) {
                 const index = course.sections.indexOf(sectionId)
                 course.sections.splice(index, 1)
-                if(course.sections.length == 0) {
+                if (course.sections.length == 0) {
                     course.isActive = false
                 }
                 await course.save()
@@ -249,7 +251,7 @@ export const InstructorCourseController = {
         try {
             const { title, description, isFree, sectionId, lessonIndex } = req.body;
             let free = false
-            if(isFree == 'true') {
+            if (isFree == 'true') {
                 free = true
             }
             const videoFile = req.file as Express.Multer.File
@@ -281,8 +283,8 @@ export const InstructorCourseController = {
     // addNewLesson
     addNewLesson: asyncHandler(async (req: Request, res: Response) => {
         try {
-            const { title, description, isFree, sectionId } = req.body;let free = false
-            if(isFree == 'true') {
+            const { title, description, isFree, sectionId } = req.body; let free = false
+            if (isFree == 'true') {
                 free = true
             }
             const videoFile = req.file as Express.Multer.File
@@ -310,6 +312,26 @@ export const InstructorCourseController = {
         } catch (error) {
             console.error(error);
             res.status(ResponseStatus.InternalServerError).json({ error: 'Error adding lesson.' });
+        }
+    }),
+
+    // getStudents
+    getStudents: asyncHandler(async (req: Request, res: Response) => {
+        try {
+            const instructorid = req.params.instructorid
+            const courses = await Course.find({ instructorid });
+
+            const courseIds = courses.map(course => course._id);
+
+            const enrollments = await Enrollment.find({ courseid: { $in: courseIds } });
+
+            const studentIds = enrollments.map(enrollment => enrollment.studentid);
+
+            const students = await Student.find({ _id: { $in: studentIds } });
+            res.status(ResponseStatus.OK).json({ message: 'Successfully fetched students', students });
+        } catch (error) {
+            console.error(error);
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Error fetching student data.' });
         }
     }),
 }
