@@ -70,6 +70,7 @@ export const InstructorCourseController = {
             await newSection.save();
             if (course) {
                 course.sections.push(newSection._id)
+                course.lessoncount += lessons.length
                 if (course.sections.length > 0) {
                     course.isActive = true
                 }
@@ -185,10 +186,12 @@ export const InstructorCourseController = {
             const sectionId = req.body.sectionId
             const courseId = req.body.courseId
             const course = await Course.findById(courseId)
+            const section = await Section.findById(sectionId)
             const result = await Section.findByIdAndDelete(sectionId);
-            if (course && result) {
+            if (course && result && section) {
                 const index = course.sections.indexOf(sectionId)
                 course.sections.splice(index, 1)
+                course.lessoncount -= section.lessons.length
                 if (course.sections.length == 0) {
                     course.isActive = false
                 }
@@ -208,9 +211,12 @@ export const InstructorCourseController = {
             const sectionId = req.body.sectionId
             const lessonIndex = req.body.lessonIndex
             const section = await Section.findById(sectionId)
-            if (section) {
+            const course = await Course.findOne({ sections: sectionId });
+            if (section && course) {
+                course.lessoncount -= 1
                 section.lessons.splice(lessonIndex, 1)
                 await section.save()
+                await course.save()
                 res.status(ResponseStatus.OK).json({ message: 'Lesson deleted succesfully.' });
             } else {
                 res.status(ResponseStatus.InternalServerError).json({ error: 'Section not found.' });
@@ -293,7 +299,9 @@ export const InstructorCourseController = {
                 const url = s3Response.Location
                 console.log('url of the video from the s3bucket: ', url)
                 const section = await Section.findById(sectionId)
-                if (section) {
+                const course = await Course.findOne({ sections: sectionId });
+                if (section && course) {
+                    course.lessoncount += 1
                     const newLesson = {
                         _id: new mongoose.Types.ObjectId(),
                         title,
@@ -301,7 +309,7 @@ export const InstructorCourseController = {
                         free,
                         video: url
                     };
-
+                    await course.save()
                     section.lessons.push(newLesson);
                     await section.save()
                     res.status(ResponseStatus.OK).json({ message: 'Lesson added succesfully.', newLesson });

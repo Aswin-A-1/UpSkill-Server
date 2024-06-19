@@ -5,6 +5,7 @@ export interface EnrollmentDocument extends Document {
     amount: number,
     studentid: mongoose.Schema.Types.ObjectId,
     courseid: mongoose.Schema.Types.ObjectId,
+    completedlessons: string[];
     dateofEnrollment: Date,
     premium: boolean,
 }
@@ -14,6 +15,7 @@ const enrollmentSchema = new Schema({
     amount: { type: Number, required: true },
     studentid: { type: mongoose.Schema.Types.ObjectId, required: true },
     courseid: { type: mongoose.Schema.Types.ObjectId, required: true },
+    completedlessons: [{ type: String, default: [] }],
     dateofEnrollment: { type: Date, default: Date.now },
     premium: { type: Boolean, default: false }
 })

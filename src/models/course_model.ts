@@ -8,6 +8,7 @@ export interface CourseDocument extends Document {
     thumbnailimage: string;
     sections: string[];
     instructorid: mongoose.Schema.Types.ObjectId,
+    lessoncount: number;
     isBlocked: boolean;
     isActive: boolean;
 }
@@ -20,6 +21,7 @@ const courseSchema = new Schema({
     thumbnailimage: { type: String, required: true },
     sections: [{ type: String, default: [] }],
     instructorid: { type: mongoose.Schema.Types.ObjectId, required: true },
+    lessoncount: { type: Number, default: 0 },
     isBlocked: { type: Boolean, default: false },
     isActive: { type: Boolean, default: false }
 })

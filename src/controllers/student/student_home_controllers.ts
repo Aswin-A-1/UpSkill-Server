@@ -66,6 +66,55 @@ export const StudentHomeController = {
         }
     }),
 
+    // isCompleted
+    isCompleted: asyncHandler(async (req: Request, res: Response) => {
+        try {
+            const { courseId, studentId, lessonId } = req.body
+            const enrollment = await Enrollment.findOne({ courseid: courseId, studentid: studentId });
+            if (enrollment) {
+                const isCompleted = enrollment.completedlessons.includes(lessonId);
+                if (isCompleted) {
+                    res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', isCompleted: true });
+                } else {
+                    res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', isCompleted: false });
+                }
+            } else {
+                res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', isCompleted: false });
+            }
+        } catch (error) {
+            console.error(error);
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Internal server error' });
+        }
+    }),
+
+    // changeCompletionStatus
+    changeCompletionStatus: asyncHandler(async (req: Request, res: Response) => {
+        try {
+            const { courseId, studentId, lessonId } = req.body
+            const enrollment = await Enrollment.findOne({ courseid: courseId, studentid: studentId });
+            if (enrollment) {
+                const lessonIndex = enrollment.completedlessons.indexOf(lessonId);
+                let isCompleted;
+
+                if (lessonIndex > -1) {
+                    enrollment.completedlessons.splice(lessonIndex, 1);
+                    isCompleted = false;
+                } else {
+                    enrollment.completedlessons.push(lessonId);
+                    isCompleted = true;
+                }
+
+                await enrollment.save();
+                res.status(ResponseStatus.OK).json({ message: 'Successfully updated completion status', isCompleted });
+            } else {
+                res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', isCompleted: false });
+            }
+        } catch (error) {
+            console.error(error);
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Internal server error' });
+        }
+    }),
+
     // courseEnroll
     courseEnroll: asyncHandler(async (req: Request, res: Response) => {
         try {

@@ -20,6 +20,8 @@ router.get('/getcoursesoutside', StudentHomeController.getCourses);
 router.post('/getcourse', StudentHomeController.getCourse);
 router.post('/getmycourse', StudentHomeController.getMyCourse);
 router.post('/isenrolled', StudentHomeController.isEnrolled);
+router.post('/iscompleted', StudentHomeController.isCompleted);
+router.post('/changecompletion', StudentHomeController.changeCompletionStatus);
 router.post('/courseenroll', StudentHomeController.courseEnroll);
 router.post('/search', StudentHomeController.search);
 router.post('/getmessages', StudentHomeController.getMessages);
