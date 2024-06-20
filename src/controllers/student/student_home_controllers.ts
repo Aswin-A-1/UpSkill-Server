@@ -43,7 +43,18 @@ export const StudentHomeController = {
             const enrollments = await Enrollment.find({ studentid: userId });
             const courseIds = enrollments.map(enrollment => enrollment.courseid);
             const courses = await Course.find({ _id: { $in: courseIds } });
-            res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', courses });
+            const coursesWithCompletion = courses.map(course => {
+                const enrollment = enrollments.find(enrollment => String(enrollment.courseid) === String(course._id));
+                const completedLessonsCount = enrollment?.completedlessons.length || 0;
+                const totalLessonsCount = course.lessoncount;
+                const completionPercentage = (completedLessonsCount / totalLessonsCount) * 100;
+    
+                return {
+                    ...course.toObject(),
+                    completionPercentage: Math.ceil(completionPercentage)
+                };
+            });
+            res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', coursesWithCompletion });
         } catch (error) {
             console.error(error);
             res.status(ResponseStatus.InternalServerError).json({ error: 'Internal server error' });
