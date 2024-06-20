@@ -342,4 +342,63 @@ export const InstructorCourseController = {
             res.status(ResponseStatus.InternalServerError).json({ error: 'Error fetching student data.' });
         }
     }),
+
+    // getDashboardData
+    getDashboardData: asyncHandler(async (req: Request, res: Response) => {
+        try {
+            const instructorid = req.params.instructorid
+            const courses = await Course.find({ instructorid });
+
+            const courseIds = courses.map(course => course._id);
+
+            const enrollments = await Enrollment.find({ courseid: { $in: courseIds } });
+            let totalRevenue = 0;
+            const uniqueStudentIds = new Set();
+            const courseEnrollmentCount: { [key: string]: number } = {};
+            const monthlyEnrollments: { [key: string]: number } = {};
+
+            enrollments.forEach(enrollment => {
+                totalRevenue += enrollment.amount;
+                uniqueStudentIds.add(enrollment.studentid.toString());
+
+                const courseId = enrollment.courseid.toString();
+                if (courseEnrollmentCount[courseId]) {
+                    courseEnrollmentCount[courseId]++;
+                } else {
+                    courseEnrollmentCount[courseId] = 1;
+                }
+
+                const date = new Date(enrollment.dateofEnrollment);
+                const enrollmentMonth = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+
+                if (monthlyEnrollments[enrollmentMonth]) {
+                    monthlyEnrollments[enrollmentMonth]++;
+                } else {
+                    monthlyEnrollments[enrollmentMonth] = 1;
+                }
+            })
+
+            const totalStudents = uniqueStudentIds.size;
+            let trendingCourseId = null;
+            let maxEnrollments = 0;
+            for (const courseId in courseEnrollmentCount) {
+                if (courseEnrollmentCount[courseId] > maxEnrollments) {
+                    maxEnrollments = courseEnrollmentCount[courseId];
+                    trendingCourseId = courseId;
+                }
+            }
+
+            let trendingCourse = null;
+            if (trendingCourseId) {
+                trendingCourse = await Course.findById(trendingCourseId);
+            }
+
+            const newEnrollment = { '2024-01': 4, '2024-02': 9, '2024-04': 2, '2024-06': 5, '2024-07': 10, '2024-08': 2 }
+
+            res.status(ResponseStatus.OK).json({ message: 'Successfully fetched dashboard data', totalRevenue, totalStudents, trendingCourse: trendingCourse ? trendingCourse.coursename : 'No course', monthlyEnrollments });
+        } catch (error) {
+            console.error(error);
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Error fetching dashboard data.' });
+        }
+    }),
 }

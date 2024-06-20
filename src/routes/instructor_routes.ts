@@ -43,6 +43,7 @@ router.get('/getcategory', authenticateInstructorToken, InstructorCourseControll
 router.get('/getverification/:instructorid', authenticateInstructorToken, InstructorCourseController.getVerification);
 router.get('/getsection/:courseid', authenticateInstructorToken, InstructorCourseController.getSection);
 router.get('/getstudents/:instructorid', authenticateInstructorToken, InstructorCourseController.getStudents);
+router.get('/getdashboarddata/:instructorid', authenticateInstructorToken, InstructorCourseController.getDashboardData);
 router.post('/editsection', InstructorCourseController.editSection);
 router.post('/editlesson', InstructorCourseController.editLesson);
 router.post('/editlessonwithvideo', singleVideoUpload.single('videofile'), InstructorCourseController.editLessonWithVideo);
