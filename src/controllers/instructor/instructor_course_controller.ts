@@ -86,9 +86,14 @@ export const InstructorCourseController = {
     // getCourseDetails
     getCourse: asyncHandler(async (req: Request, res: Response) => {
         try {
+            const page = parseInt(req.query.page as string, 10);
+            const limit = parseInt(req.query.limit as string, 10);
+            const skip = (page - 1) * limit;
             const instructorid = req.params.instructorid
-            const courses = await Course.find({ instructorid: instructorid });
-            res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', courses });
+            const courses = await Course.find({ instructorid: instructorid }).skip(skip)
+                .limit(limit)
+            const totalcount = await Course.countDocuments();
+            res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', courses, totalcount });
         } catch (error) {
             console.error(error);
             res.status(ResponseStatus.InternalServerError).json({ error: 'Error fetching course data.' });
@@ -348,6 +353,10 @@ export const InstructorCourseController = {
         try {
             const instructorid = req.params.instructorid
             const courses = await Course.find({ instructorid });
+            const courseNamesMap: Record<string, any> = {};
+            for (const course of courses) {
+                courseNamesMap[course._id] = course.coursename;
+            }
 
             const courseIds = courses.map(course => course._id);
 
@@ -356,12 +365,14 @@ export const InstructorCourseController = {
             const uniqueStudentIds = new Set();
             const courseEnrollmentCount: { [key: string]: number } = {};
             const monthlyEnrollments: { [key: string]: number } = {};
+            const individualCourseMonthlyEnrollments: { [key: string]: { [key: string]: number } } = {};
 
             enrollments.forEach(enrollment => {
                 totalRevenue += enrollment.amount;
                 uniqueStudentIds.add(enrollment.studentid.toString());
 
                 const courseId = enrollment.courseid.toString();
+                const courseName = courseNamesMap[courseId];
                 if (courseEnrollmentCount[courseId]) {
                     courseEnrollmentCount[courseId]++;
                 } else {
@@ -375,6 +386,16 @@ export const InstructorCourseController = {
                     monthlyEnrollments[enrollmentMonth]++;
                 } else {
                     monthlyEnrollments[enrollmentMonth] = 1;
+                }
+
+                if (!individualCourseMonthlyEnrollments[courseName]) {
+                    individualCourseMonthlyEnrollments[courseName] = {};
+                }
+
+                if (individualCourseMonthlyEnrollments[courseName][enrollmentMonth]) {
+                    individualCourseMonthlyEnrollments[courseName][enrollmentMonth]++;
+                } else {
+                    individualCourseMonthlyEnrollments[courseName][enrollmentMonth] = 1;
                 }
             })
 
@@ -393,9 +414,7 @@ export const InstructorCourseController = {
                 trendingCourse = await Course.findById(trendingCourseId);
             }
 
-            const newEnrollment = { '2024-01': 4, '2024-02': 9, '2024-04': 2, '2024-06': 5, '2024-07': 10, '2024-08': 2 }
-
-            res.status(ResponseStatus.OK).json({ message: 'Successfully fetched dashboard data', totalRevenue, totalStudents, trendingCourse: trendingCourse ? trendingCourse.coursename : 'No course', monthlyEnrollments });
+            res.status(ResponseStatus.OK).json({ message: 'Successfully fetched dashboard data', totalRevenue, totalStudents, trendingCourse: trendingCourse ? trendingCourse.coursename : 'No course', monthlyEnrollments, individualCourseMonthlyEnrollments });
         } catch (error) {
             console.error(error);
             res.status(ResponseStatus.InternalServerError).json({ error: 'Error fetching dashboard data.' });

@@ -44,12 +44,12 @@ router.get('/getverification/:instructorid', authenticateInstructorToken, Instru
 router.get('/getsection/:courseid', authenticateInstructorToken, InstructorCourseController.getSection);
 router.get('/getstudents/:instructorid', authenticateInstructorToken, InstructorCourseController.getStudents);
 router.get('/getdashboarddata/:instructorid', authenticateInstructorToken, InstructorCourseController.getDashboardData);
-router.post('/editsection', InstructorCourseController.editSection);
-router.post('/editlesson', InstructorCourseController.editLesson);
+router.put('/editsection', InstructorCourseController.editSection);
+router.put('/editlesson', InstructorCourseController.editLesson);
 router.post('/editlessonwithvideo', singleVideoUpload.single('videofile'), InstructorCourseController.editLessonWithVideo);
 router.post('/addlesson', singleVideoUpload.single('videofile'), InstructorCourseController.addNewLesson);
-router.post('/deletesection', InstructorCourseController.deleteSection);
-router.post('/deletelesson', InstructorCourseController.deleteLesson);
+router.delete('/deletesection', InstructorCourseController.deleteSection);
+router.delete('/deletelesson', InstructorCourseController.deleteLesson);
 router.post('/updateprofile', videoupload.any(), InstructorProfileController.updateProfile);
 router.post('/updateverification', authenticateInstructorToken, InstructorProfileController.updateVerification);
 router.get('/getprofile/:instructorid', authenticateInstructorToken, InstructorProfileController.getInstructorProfile);
