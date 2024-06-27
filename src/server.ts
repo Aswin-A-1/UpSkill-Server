@@ -15,7 +15,7 @@ import { instructorRoute } from './routes/instructor_routes';
 import { googleRoute } from './routes/google_auth_routes';
 import { corsOption } from './config/cors_config';
 
-import './auth/passport'
+// import './auth/passport'
 import { configureSocket } from './socket/socketConnection';
 
 dotenv.config();
