@@ -6,7 +6,7 @@ import { Enrollment } from '../../models/enrollment_model';
 
 
 export const AdminCourseController = {
-    
+
 
     // getDashboardData
     getDashboardData: asyncHandler(async (req: Request, res: Response) => {
@@ -22,9 +22,13 @@ export const AdminCourseController = {
             const enrollments = await Enrollment.find({ courseid: { $in: courseIds } });
             let totalRevenue = 0;
             const uniqueStudentIds = new Set();
+            const revenuePerCourse: { [key: string]: number } = {};
             const courseEnrollmentCount: { [key: string]: number } = {};
             const monthlyEnrollments: { [key: string]: number } = {};
             const individualCourseMonthlyEnrollments: { [key: string]: { [key: string]: number } } = {};
+            const courseCompletionCount: { [key: string]: number } = {};
+            const courseCompletedStudentCount: { [key: string]: number } = {};
+            const courseCompletionRates: { [key: string]: number } = {};
 
             enrollments.forEach(enrollment => {
                 totalRevenue += enrollment.amount;
@@ -36,6 +40,27 @@ export const AdminCourseController = {
                     courseEnrollmentCount[courseId]++;
                 } else {
                     courseEnrollmentCount[courseId] = 1;
+                }
+
+                if (revenuePerCourse[courseName]) {
+                    revenuePerCourse[courseName] += enrollment.amount;
+                } else {
+                    revenuePerCourse[courseName] = enrollment.amount;
+                }
+
+                if (courseCompletionCount[courseId]) {
+                    courseCompletionCount[courseId] += enrollment.completedlessons.length;
+                } else {
+                    courseCompletionCount[courseId] = enrollment.completedlessons.length;
+                }
+
+                const course = courses.find(course => course._id.toString() === courseId);
+                if (course && enrollment.completedlessons.length === course.lessoncount) {
+                    if (courseCompletedStudentCount[courseId]) {
+                        courseCompletedStudentCount[courseId]++;
+                    } else {
+                        courseCompletedStudentCount[courseId] = 1;
+                    }
                 }
 
                 const date = new Date(enrollment.dateofEnrollment);
@@ -59,6 +84,11 @@ export const AdminCourseController = {
             })
 
             const totalStudents = uniqueStudentIds.size;
+            for (const courseId in courseEnrollmentCount) {
+                const enrolled = courseEnrollmentCount[courseId];
+                const completed = courseCompletedStudentCount[courseId] || 0;
+                courseCompletionRates[courseNamesMap[courseId]] = (completed / enrolled) * 100;
+            }
             let trendingCourseId = null;
             let maxEnrollments = 0;
             for (const courseId in courseEnrollmentCount) {
@@ -72,7 +102,8 @@ export const AdminCourseController = {
             if (trendingCourseId) {
                 trendingCourse = await Course.findById(trendingCourseId);
             }
-            res.status(ResponseStatus.OK).json({ message: 'Successfully fetched dashboard data', totalRevenue, totalStudents, trendingCourse: trendingCourse ? trendingCourse.coursename : 'No course', monthlyEnrollments, individualCourseMonthlyEnrollments });
+            console.log('courseCompletionRate', courseCompletionRates);
+            res.status(ResponseStatus.OK).json({ message: 'Successfully fetched dashboard data', totalRevenue, totalStudents, trendingCourse: trendingCourse ? trendingCourse.coursename : 'No course', monthlyEnrollments, individualCourseMonthlyEnrollments, revenuePerCourse, courseCompletionRates });
         } catch (error) {
             console.error(error);
             res.status(ResponseStatus.InternalServerError).json({ error: 'Error fetching dashboard data.' });
