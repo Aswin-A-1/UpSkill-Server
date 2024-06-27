@@ -38,9 +38,9 @@ const PORT: any = process.env.PORT || 3000;
 
 app.use(express.json());
 
-app.use(cors());
+app.use(cors(corsOption));
 
-app.options('*', cors());
+
 // app.get('/', (req: Request, res: Response) => {
 //     res.send('UpSkill')
 // })
