@@ -21,11 +21,30 @@ export const AdminStudentController = {
         }
     }),
 
+    // getStudentDetailsList
+    getStudentsList: asyncHandler(async (req: Request, res: Response) => {
+        try {
+            const page = parseInt(req.query.page as string, 10);
+            const limit = parseInt(req.query.limit as string, 10);
+            const skip = (page - 1) * limit;
+            const students = await Student.find({ role: 'Student' }).skip(skip).limit(limit);
+            const totalcount = await Student.find({ role: 'Student' }).countDocuments();
+            res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', students, totalcount });
+        } catch (error) {
+            console.error(error);
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Error fetching student data.' });
+        }
+    }),
+
     // getInstructorDetails
     getInstructors: asyncHandler(async (req: Request, res: Response) => {
         try {
-            const instructors = await Instructor.find();
-            res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', instructors });
+            const page = parseInt(req.query.page as string, 10);
+            const limit = parseInt(req.query.limit as string, 10);
+            const skip = (page - 1) * limit;
+            const instructors = await Instructor.find().skip(skip).limit(limit);
+            const totalcount = await Instructor.find().countDocuments()
+            res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', instructors, totalcount });
         } catch (error) {
             console.error(error);
             res.status(ResponseStatus.InternalServerError).json({ error: 'Error fetching instructor data.' });
@@ -35,8 +54,12 @@ export const AdminStudentController = {
     // getCoureseDetails
     getCourses: asyncHandler(async (req: Request, res: Response) => {
         try {
-            const courses = await Course.find();
-            res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', courses });
+            const page = parseInt(req.query.page as string, 10);
+            const limit = parseInt(req.query.limit as string, 10);
+            const skip = (page - 1) * limit;
+            const courses = await Course.find().skip(skip).limit(limit);
+            const totalcount = await Course.find().countDocuments();
+            res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', courses, totalcount });
         } catch (error) {
             console.error(error);
             res.status(ResponseStatus.InternalServerError).json({ error: 'Error fetching course data.' });

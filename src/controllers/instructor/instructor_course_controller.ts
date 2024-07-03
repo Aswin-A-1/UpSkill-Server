@@ -133,8 +133,13 @@ export const InstructorCourseController = {
     // getCategoryDetails
     getCategory: asyncHandler(async (req: Request, res: Response) => {
         try {
-            const categorys = await Category.find();
-            res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', categorys });
+            
+            const page = parseInt(req.query.page as string, 10);
+            const limit = parseInt(req.query.limit as string, 10);
+            const skip = (page - 1) * limit;
+            const categorys = await Category.find().skip(skip).limit(limit);
+            const totalcount = await Category.find().countDocuments();
+            res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', categorys, totalcount });
         } catch (error) {
             res.status(ResponseStatus.InternalServerError).json({ error: 'Error fetching category data.' });
         }
@@ -342,6 +347,28 @@ export const InstructorCourseController = {
 
             const students = await Student.find({ _id: { $in: studentIds } });
             res.status(ResponseStatus.OK).json({ message: 'Successfully fetched students', students });
+        } catch (error) {
+            console.error(error);
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Error fetching student data.' });
+        }
+    }),
+
+    // getStudentsList
+    getStudentslist: asyncHandler(async (req: Request, res: Response) => {
+        try {
+            const page = parseInt(req.query.page as string, 10);
+            const limit = parseInt(req.query.limit as string, 10);
+            const skip = (page - 1) * limit;
+            const instructorid = req.params.instructorid
+            const courses = await Course.find({ instructorid });
+
+            const courseIds = courses.map(course => course._id);
+            const enrollments = await Enrollment.find({ courseid: { $in: courseIds } });
+            const studentIds = enrollments.map(enrollment => enrollment.studentid);
+
+            const students = await Student.find({ _id: { $in: studentIds } }).skip(skip).limit(limit)
+            const totalcount = await Student.find({ _id: { $in: studentIds } }).countDocuments()
+            res.status(ResponseStatus.OK).json({ message: 'Successfully fetched students', students, totalcount });
         } catch (error) {
             console.error(error);
             res.status(ResponseStatus.InternalServerError).json({ error: 'Error fetching student data.' });

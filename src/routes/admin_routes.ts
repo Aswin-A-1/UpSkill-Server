@@ -9,6 +9,7 @@ import { AdminCourseController } from '../controllers/admin/admin_course_control
 const router: Router = express.Router();
 
 router.get('/getStudent', authenticateAdminToken, AdminStudentController.getStudents);
+router.get('/getStudentlist', authenticateAdminToken, AdminStudentController.getStudentsList);
 router.get('/getInstructors', authenticateAdminToken, AdminStudentController.getInstructors);
 router.get('/getCourses', authenticateAdminToken, AdminStudentController.getCourses);
 router.get('/getCategory', authenticateAdminToken, InstructorCourseController.getCategory);

@@ -43,6 +43,7 @@ router.get('/getcategory', authenticateInstructorToken, InstructorCourseControll
 router.get('/getverification/:instructorid', authenticateInstructorToken, InstructorCourseController.getVerification);
 router.get('/getsection/:courseid', authenticateInstructorToken, InstructorCourseController.getSection);
 router.get('/getstudents/:instructorid', authenticateInstructorToken, InstructorCourseController.getStudents);
+router.get('/getstudentslist/:instructorid', authenticateInstructorToken, InstructorCourseController.getStudentslist);
 router.get('/getdashboarddata/:instructorid', authenticateInstructorToken, InstructorCourseController.getDashboardData);
 router.put('/editsection', InstructorCourseController.editSection);
 router.put('/editlesson', InstructorCourseController.editLesson);
