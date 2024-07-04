@@ -52,8 +52,8 @@ router.post('/addlesson', singleVideoUpload.single('videofile'), InstructorCours
 router.delete('/deletesection', InstructorCourseController.deleteSection);
 router.delete('/deletelesson', InstructorCourseController.deleteLesson);
 router.post('/updateprofile', videoupload.any(), InstructorProfileController.updateProfile);
-router.post('/updateverification', authenticateInstructorToken, InstructorProfileController.updateVerification);
-router.get('/getprofile/:instructorid', authenticateInstructorToken, InstructorProfileController.getInstructorProfile);
+router.post('/updateverification', InstructorProfileController.updateVerification);
+router.get('/getprofile/:instructorid', InstructorProfileController.getInstructorProfile);
 
 
 export const instructorRoute = router;

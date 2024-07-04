@@ -8,6 +8,7 @@ import { Instructor } from '../../models/instructor_model';
 import { Enrollment } from '../../models/enrollment_model';
 import { Message } from '../../models/message_model';
 import { Category } from '../../models/category_model';
+import { Wishlist } from '../../models/wishlist_model';
 
 
 export const StudentHomeController = {
@@ -27,7 +28,6 @@ export const StudentHomeController = {
     getCategories: asyncHandler(async (req: Request, res: Response) => {
         try {
             const categories = await Category.find();
-            console.log('categories', categories)
             res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', categories });
         } catch (error) {
             console.error(error);
@@ -73,13 +73,76 @@ export const StudentHomeController = {
                 const completedLessonsCount = enrollment?.completedlessons.length || 0;
                 const totalLessonsCount = course.lessoncount;
                 const completionPercentage = (completedLessonsCount / totalLessonsCount) * 100;
-    
+
                 return {
                     ...course.toObject(),
                     completionPercentage: Math.ceil(completionPercentage)
                 };
             });
             res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', coursesWithCompletion });
+        } catch (error) {
+            console.error(error);
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Internal server error' });
+        }
+    }),
+
+    // wishlist
+    wishlist: asyncHandler(async (req: Request, res: Response) => {
+        try {
+            const { courseId, studentId } = req.body;
+
+            let wishlist = await Wishlist.findOne({ studentId });
+
+            if (!wishlist) {
+                wishlist = new Wishlist({ studentId, courses: [courseId] });
+                await wishlist.save();
+                res.status(ResponseStatus.OK).json({ message: 'Course added to wishlist', status: true });
+            } else {
+                const courseIndex = wishlist.courses.indexOf(courseId);
+
+                if (courseIndex > -1) {
+                    wishlist.courses.splice(courseIndex, 1);
+                    await wishlist.save();
+                    res.status(ResponseStatus.OK).json({ message: 'Course removed from wishlist', status: false });
+                } else {
+                    wishlist.courses.push(courseId);
+                    await wishlist.save();
+                    res.status(ResponseStatus.OK).json({ message: 'Course added to wishlist', status: true });
+                }
+            }
+        } catch (error) {
+            console.error(error);
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Internal server error' });
+        }
+    }),
+
+    // getWishlist
+    getWishlist: asyncHandler(async (req: Request, res: Response) => {
+        try {
+            const studentId = req.params.studentid;
+            const wishlist = await Wishlist.findOne({ studentId });
+            if (wishlist) {
+                res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', courses: wishlist.courses });
+            } else {
+                res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', courses: [] });
+            }
+        } catch (error) {
+            console.error(error);
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Internal server error' });
+        }
+    }),
+
+    // getWishlistCourses
+    getWishlistCourses: asyncHandler(async (req: Request, res: Response) => {
+        try {
+            const studentId = req.params.studentid;
+            const wishlist = await Wishlist.findOne({ studentId });
+            if (wishlist) {
+                const courses = await Course.find({ _id: { $in: wishlist.courses } });
+                res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', courses: courses });
+            } else {
+                res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', courses: [] });
+            }
         } catch (error) {
             console.error(error);
             res.status(ResponseStatus.InternalServerError).json({ error: 'Internal server error' });
