@@ -17,6 +17,8 @@ router.post('/test', authenticateToken, StudentController.test);
 router.post('/refresh-token', StudentController.refreshToken);
 router.get('/getcourses', authenticateStudentToken, StudentHomeController.getCourses);
 router.get('/getcoursesoutside', StudentHomeController.getCourses);
+router.get('/getcategories', StudentHomeController.getCategories);
+router.post('/getcoursebycategory', StudentHomeController.getCourseByCategory);
 router.post('/getcourse', StudentHomeController.getCourse);
 router.post('/getmycourse', StudentHomeController.getMyCourse);
 router.post('/isenrolled', StudentHomeController.isEnrolled);

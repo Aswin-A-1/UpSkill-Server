@@ -7,6 +7,7 @@ import { Section } from '../../models/section_model';
 import { Instructor } from '../../models/instructor_model';
 import { Enrollment } from '../../models/enrollment_model';
 import { Message } from '../../models/message_model';
+import { Category } from '../../models/category_model';
 
 
 export const StudentHomeController = {
@@ -22,6 +23,18 @@ export const StudentHomeController = {
         }
     }),
 
+    // getCategories
+    getCategories: asyncHandler(async (req: Request, res: Response) => {
+        try {
+            const categories = await Category.find();
+            console.log('categories', categories)
+            res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', categories });
+        } catch (error) {
+            console.error(error);
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Internal server error' });
+        }
+    }),
+
     // getCourse
     getCourse: asyncHandler(async (req: Request, res: Response) => {
         try {
@@ -30,6 +43,18 @@ export const StudentHomeController = {
             const instructor = await Instructor.findById(course?.instructorid)
             const sections = await Section.find({ courseid: courseId });
             res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', course, sections, instructor: instructor?.username });
+        } catch (error) {
+            console.error(error);
+            res.status(ResponseStatus.InternalServerError).json({ error: 'Internal server error' });
+        }
+    }),
+
+    // getCourseByCategory
+    getCourseByCategory: asyncHandler(async (req: Request, res: Response) => {
+        try {
+            const category = req.body.category
+            const courses = await Course.find({ category: category });
+            res.status(ResponseStatus.OK).json({ message: 'Succesfully fetched data', courses });
         } catch (error) {
             console.error(error);
             res.status(ResponseStatus.InternalServerError).json({ error: 'Internal server error' });
