@@ -1,7 +1,7 @@
 export const corsOption =  {
     // origin: 'http://localhost:4200',
     origin: 'https://up-skill-five.vercel.app',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'authorization-student', 'authorization-instructor', 'authorization-admin',"Access-Control-Allow-Origin"],
     credentials: true,
     optionsSuccessStatus: 200
