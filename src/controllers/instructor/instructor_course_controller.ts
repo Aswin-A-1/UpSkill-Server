@@ -46,6 +46,7 @@ export const InstructorCourseController = {
     // Add section
     addsection: asyncHandler(async (req: Request, res: Response) => {
         try {
+            console.log('uploading started')
             const { title, description, lessons } = JSON.parse(req.body.section);
             const courseId = req.body.courseId
             const course = await Course.findById(courseId)
