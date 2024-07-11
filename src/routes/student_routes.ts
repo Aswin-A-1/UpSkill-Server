@@ -29,10 +29,9 @@ router.post('/iscompleted', StudentHomeController.isCompleted);
 router.post('/changecompletion', authenticateStudentToken, StudentHomeController.changeCompletionStatus);
 router.post('/courseenroll', authenticateStudentToken, StudentHomeController.courseEnroll);
 router.post('/search', StudentHomeController.search);
-router.post('/getmessages', authenticateStudentToken, StudentHomeController.getMessages);
+router.post('/getmessages', StudentHomeController.getMessages);
 router.post('/create-payment-intent', StudentPaymentController.initPayment);
 router.get('/getprofile/:studentid', authenticateStudentToken, StudentController.getStudentProfile);
-
 
 router.get('/sample', (req: Request, res: Response) => {
     res.status(ResponseStatus.OK).json({ message: 'Hello' });
