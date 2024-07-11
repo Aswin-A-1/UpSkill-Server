@@ -33,6 +33,7 @@ router.post('/getmessages', authenticateStudentToken, StudentHomeController.getM
 router.post('/create-payment-intent', StudentPaymentController.initPayment);
 router.get('/getprofile/:studentid', authenticateStudentToken, StudentController.getStudentProfile);
 
+
 router.get('/sample', (req: Request, res: Response) => {
     res.status(ResponseStatus.OK).json({ message: 'Hello' });
 })
